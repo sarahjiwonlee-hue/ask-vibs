@@ -18,7 +18,6 @@ import os
 import sys
 import re
 import logging
-import random
 from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -56,11 +55,6 @@ st.markdown("""
     border-left: 3px solid #ccc; padding-left: 0.6rem;
     color: #555; font-size: 0.88em; font-style: italic; margin-top: 0.3rem;
 }
-.funfact-box {
-    background: #4A148C;
-    border-left: 4px solid #CE93D8; border-radius: 8px;
-    padding: 0.8rem 1rem; margin-bottom: 1rem; color: white;
-}
 .conv-active {
     background: #ede7f6; border-radius: 6px;
     padding: 4px 8px; font-weight: bold;
@@ -69,11 +63,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── Constants ─────────────────────────────────────────────────────────────
-FUN_FACT_TOPICS = [
-    "transformer architecture", "RLHF", "large language models",
-    "RAG systems", "attention mechanisms", "prompt engineering",
-    "natural language processing", "word embeddings", "agentic AI",
-]
 QUICK_PROMPTS = [
     "What is RLHF and how does it work?",
     "How do RAG systems work?",
@@ -176,8 +165,6 @@ def init_state():
         st.session_state.active_conv = "conv_1"
     if "conv_counter" not in st.session_state:
         st.session_state.conv_counter = 1
-    if "fun_fact" not in st.session_state:
-        st.session_state.fun_fact = None
     if "quick_prompt" not in st.session_state:
         st.session_state.quick_prompt = None
     if "mode" not in st.session_state:
@@ -340,22 +327,6 @@ def render_chat_page(pipeline):
     )
 
     conv = st.session_state.conversations[st.session_state.active_conv]
-
-    # Fun fact (once per session)
-    if st.session_state.fun_fact is None:
-        topic = random.choice(FUN_FACT_TOPICS)
-        with st.spinner("Loading a fun fact…"):
-            result = pipeline.query(
-                question=f"Share one surprising fun fact about {topic} in 2–3 sentences. Be concise and engaging.",
-                chat_history=[],
-                top_k=3,
-            )
-        st.session_state.fun_fact = result["answer"]
-
-    st.markdown(
-        f'<div class="funfact-box">💡 <strong>Did you know?</strong><br>{st.session_state.fun_fact}</div>',
-        unsafe_allow_html=True,
-    )
 
     # Quick prompts (when chat is empty)
     if not conv["messages"]:
