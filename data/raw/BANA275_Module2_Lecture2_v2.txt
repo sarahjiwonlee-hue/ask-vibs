@@ -1,0 +1,325 @@
+BANA 275 • WEEK 2
+NLP Basics:
+Bag of Words → TF‑IDF → Logistic Regression → Evaluation
+OUTCOMES
+What you’ll be able to do today
+Build two strong text baselines (BoW + TF‑IDF) in Google Colab
+Evaluate correctly (train/val/test, Macro F1, confusion matrix)
+Create a Failure Gallery: 10 mistakes + categories + hypotheses
+Compete in Baseline Olympics (Score + Insight), then close with vibe coding
+PIPELINE
+The NLP pipeline (today’s version)
+Text → minimal cleaning → vectorization → model → evaluation → iteration
+We’ll iterate using one artifact: the Failure Gallery
+EXPECTATIONS
+What “good” looks like
+A results table: Model | Macro F1 | Notes
+A confusion matrix you can explain
+A Failure Gallery that turns mistakes into a roadmap
+WARM‑UP
+Warm‑up: where does text show up in business?
+Your final project will live in one of these streams.
+Customer support tickets • call transcripts • emails • chat logs
+KYC notes • claims narratives • advisor notes • compliance reviews
+App reviews • survey comments • social media • product feedback
+1
+Preprocessing Basics
+PREPROCESSING
+Tokenization: turning text into units
+Goal: convert raw text → tokens (words, subwords, characters)
+For BoW/TF‑IDF today: word-level tokens are enough
+For LLMs: subword tokenization (BPE / WordPiece) is standard
+Tokenization choices change your feature space
+PREPROCESSING
+Normalization: make text comparable
+Lowercasing (usually helpful for BoW/TF‑IDF)
+Whitespace normalization, Unicode normalization
+Handling punctuation: sometimes signal (e.g., “!!!”), sometimes noise
+Numbers: keep when meaningful (prices, dates, IDs)
+PREPROCESSING
+Stopwords: remove with care
+Classic approach: remove high-frequency function words
+But negations matter: “not”, “never”, “without” can flip meaning
+Rule: start minimal, measure impact, then decide
+PREPROCESSING
+Stemming vs lemmatization
+Stemming: crude chopping (faster, can be messy)
+Lemmatization: dictionary-based (cleaner, slower)
+In many modern pipelines: optional — TF‑IDF + bigrams often beats heavy preprocessing
+Rule: if you do it, justify with evaluation
+PREPROCESSING
+Preprocessing: when it helps vs hurts
+Helps: noisy short text, lots of typos, boilerplate, templated signatures
+Hurts: removing negation, stripping domain jargon, losing numbers
+The only safe principle: change one thing, measure, keep a log
+2
+Bag of Words
+BOW
+Bag of Words (BoW): the core idea
+Document = vector of token counts
+Simple, sparse, surprisingly strong
+Works well for intent/sentiment/topic in many business datasets
+Word ordering does not matter (Bag of Words)
+BOW
+Toy example: 3 docs → counts
+Doc1: “refund request not processed”
+Doc2: “cancel subscription immediately”
+Doc3: “love this product great service”
+Counts become features; the model learns weights
+BOW
+Sparse vectors: why most entries are zero
+Vocabulary can be 10k–100k+ tokens
+Each document uses only a tiny fraction of that vocabulary
+Sparse representations are efficient with linear models
+BOW
+What BoW captures well
+High-signal keywords: “refund”, “broken”, “fraud”, “cancel”
+Intent classification and routing
+Fast baselines for product decisions
+BOW
+What BoW misses
+No semantics: synonyms are unrelated features
+Weak word order: “not good” problem
+Brittle under language drift and paraphrase
+BOW
+Minimal cleaning rules (today)
+Start with lowercasing and whitespace normalization
+Avoid aggressive stopword removal (negation matters)
+Don’t over-engineer — measure, then adjust
+3
+TF‑IDF
+TF‑IDF
+Counts aren’t enough: why weighting helps
+Common words dominate counts but add little signal
+We want terms that are informative, not just frequent
+TF‑IDF
+TF: term frequency (in one line)
+How often a term appears in a document
+Works, but favors long docs and common words
+TF‑IDF
+IDF: inverse document frequency (in one line)
+Down-weights terms that appear in many documents
+Up-weights rarer terms that discriminate classes
+TF‑IDF
+TF‑IDF intuition (no math)
+High weight if: important in this document AND rare overall
+Often improves baselines dramatically with little effort
+IDF weight
+dft is the document frequency of t: number of documents that contain t
+dft is an inverse measure of the informativeness of word t
+dft   N (number of documents)
+We define the idf (inverse document frequency) of t by
+
+We use log (N/dft) instead of N/dft to “dampen” the effect of idf.
+Will turn out the base of the log is immaterial.
+Sec. 6.2.1
+BANA 275: ML for Text (Spring 2019)
+25
+idf(“hate”) < idf(“arachnophobia”)
+But, depends on corpus.. In journal of spiders, idf(“hate”) might be high!
+IDF Example
+There is one idf value for each term t in a collection.
+Sec. 6.2.1
+suppose N = 1 million
+BANA 275: ML for Text (Spring 2019)
+26
+TF-IDF Example
+BANA 275: ML for Text (Spring 2019)
+27
+d1: Arachnophobia is the fear of spiders
+d3: I hate that my bills are due tomorrow.
+d2: Spiders! I hate spiders due to Arachnophobia
+suppose N = 1 million
+Comparing bag of words (BoW) vs. tf-idf
+BANA 275: ML for Text (Spring 2019)
+28
+d1: Arachnophobia is the fear of spiders
+d3: I hate that my bills are due tomorrow.
+d2: Spiders! I hate spiders due to Arachnophobia
+TF‑IDF
+When TF‑IDF shines
+Short texts with signal keywords
+Routing/triage, sentiment, topic classification
+When speed and interpretability matter
+TF‑IDF
+When TF‑IDF fails
+Semantic similarity, paraphrase, synonymy
+Long context dependencies
+Domain shift where vocabulary changes
+NEXT
+Bridge to next week: embeddings
+Embeddings capture meaning; TF‑IDF captures token statistics
+Next week: semantic search + vector similarity
+4
+n‑grams
+N‑GRAMS
+n‑grams: phrase-level signal
+Unigram: single token; bigram: token pairs; trigram: triplets
+Adds local order without full parsing
+Often a big jump for sentiment and intent
+Bag of words model
+Problem 1: Don’t consider the ordering of words in a document
+BANA 275: ML for Text (Spring 2019)
+34
+John is quicker than Mary 
+vs
+Mary is quicker than John
+Problem 2: Treat all the words in the document equally
+d1: Arachnophobia is the fear of spiders
+d3: I hate that my bills are due tomorrow.
+d2: Spiders! I hate spiders due to Arachnophobia
+d3 is closer to d2 than d1!
+Order Information: Ngrams!
+Unigram: Each component of the vector is a word
+Same as Bag of Words model
+
+
+
+Bi-grams: Each component of the vector is a “pair of words”
+
+
+
+
+N-grams: Each component of the vector is a “n-tuple of words”
+	3= Trigram, 4=Fourgram, etc.
+BANA 275: ML for Text (Spring 2019)
+35
+John is quicker than Mary
+Mary is quicker than John
+is         John  Mary    quicker     than
+John is quicker than Mary
+Mary is quicker than John
+(John,is)
+(is,quicker)
+(quicker,than)
+(than,John)
+(than,Mary)
+(Mary,is)
+They are different now!
+N‑GRAMS
+Why bigrams matter (business examples)
+“not working” vs “working”
+“cancel subscription” vs “subscription”
+“late delivery” vs “delivery”
+N‑GRAMS
+Tradeoff: feature explosion
+More n‑grams → more features → more compute and overfitting risk
+Control with max_features, min_df, max_df
+N‑GRAMS
+Practical defaults
+Start: ngram_range=(1,2)
+max_features: 20k–50k for class
+min_df: 1–2 to drop rare noise
+5
+Baselines
+BASELINES
+Baseline principle
+Ship the simplest thing that works
+A strong baseline is a benchmark and a business artifact (ROI, feasibility)
+BASELINES
+Why Logistic Regression is a default winner
+Excellent with high-dimensional sparse features
+Fast training, stable, easy to deploy
+Coefficients give quick interpretability
+BASELINES
+Regularization (intuition)
+Prevents overfitting on rare tokens and noise
+Keeps weights stable and improves generalization
+You’ll tune ‘C’ (strength) in the micro-challenge
+BASELINES
+Alternatives (mention only)
+Naive Bayes: very fast, sometimes strong on small data
+Linear SVM: strong but less probabilistic
+Today: we ship LogReg for consistency
+6
+Evaluation Discipline
+EVALUATION
+Demo vs deployable
+A demo is one example; deployable means consistent performance
+Evaluation makes progress measurable and repeatable
+EVALUATION
+Train / Validation / Test
+Train: fit the model
+Validation: tune parameters
+Test: final estimate (touch once at the end)
+EVALUATION
+Split strategies (rules of thumb)
+Random split: default for i.i.d. data
+Time split: if language drifts over time
+Group split: if multiple rows belong to same user/account
+EVALUATION
+Metrics: accuracy vs F1
+Accuracy can mislead with imbalance
+Macro F1 treats classes equally
+Confusion matrix shows error types
+EVALUATION
+Confusion matrix: read it fast
+TP/FP/FN/TN — connect to business costs
+False negatives often hurt more in risk and support scenarios
+EVALUATION
+Leakage: the silent killer (1)
+Exact duplicates or near-duplicates across splits
+Symptom: unrealistically high scores
+EVALUATION
+Leakage: the silent killer (2)
+Template leakage: the label is implied by boilerplate text
+Metadata leakage: fields that wouldn’t exist at prediction time
+EVALUATION
+Failure Gallery: your improvement backlog
+Collect 10 wrong predictions
+Categorize (negation, sarcasm, ambiguity, jargon, tail cases, missing context)
+Write a hypothesis: ‘what might fix this?’
+7
+Hands‑on Lab
+LAB
+What you’ll build in Colab (60 minutes)
+BoW + LogReg baseline
+TF‑IDF (+ bigrams) + LogReg baseline
+Macro F1 + confusion matrix
+Validation Failure Gallery (10 errors)
+LAB
+Colab cell roadmap
+1) Load data → 2) sanity checks → 3) split
+4) BoW model → 5) TF‑IDF model → 6) compare
+7) interpret tokens (optional) → 8) Failure Gallery
+LAB
+Expected outputs
+Results table (BoW vs TF‑IDF)
+Confusion matrix you can explain
+Failure Gallery table with categories + hypotheses
+LAB
+Common issues (and fixes)
+Empty vocabulary → adjust min_df / preprocessing
+Metric confusion → use Macro F1 for imbalance
+Split issues → verify label distributions per split
+8
+Baseline Olympics
+CHALLENGE
+Two-track scoring
+Track A (50%): best Macro F1 on held-out test
+Track B (50%): best Failure Gallery insight (clarity + actionability)
+CHALLENGE
+Allowed tuning knobs
+ngram_range, max_features, min_df, C
+Tune on validation; test once at the end
+CHALLENGE
+Submission format
+Macro F1 score
+Split method + leakage checks
+Failure Gallery (10 rows) + 2 bullets: what you tuned, what you learned
+9
+Vibe Coding Wrap
+VIBE CODING
+Vibe coding loop (for IHW1)
+Generate → Run → Test → Refactor → Document
+If you can’t explain it, you can’t submit it
+PROCESS.md: prompts, failures, fixes, sanity checks
+VIBE CODING
+Two sanity checks you must always include
+Label distribution + baseline comparison table
+Split integrity (no obvious duplicates/leakage)
+NEXT WEEK
+Next week teaser
+Embeddings and semantic search
+Vector similarity as a product primitive
+Your baseline becomes the benchmark

@@ -1,0 +1,33 @@
+# Environment — never commit real keys
+.env
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── IMPORTANT: DO commit chroma_db/ ─────────────────────────────────────
+# The pre-built vector store is committed so Streamlit Cloud doesn't need
+# to re-embed on every cold start.  Add it explicitly:
+#   git add chroma_db/
+# If you want to exclude it (and let the app auto-build on first run):
+# chroma_db/

@@ -1,0 +1,250 @@
+BANA 275 • Module 3
+Vector Space Models & Embeddings
+Meaning as vectors → Similarity search → Evaluation → Finance Q&A retrieval (FiQA)
+OUTCOMES
+What you’ll be able to do today
+Explain embeddings intuitively (meaning as geometry)
+
+Build semantic retrieval over finance Q&A using FAISS/Chroma in Colab
+
+Diagnose common failure modes (acronyms, negation, ambiguity)
+
+Measure retrieval quality with Recall@5 and MRR@5
+WHY THIS MATTERS
+Semantic search is the first AI product most teams ship
+Users ask messy questions; keywords miss intent
+Embeddings let you retrieve by meaning, not exact words
+Retrieval is the foundation of copilots and RAG systems
+Business value shows up as faster answers + fewer escalations
+CONTINUITY
+Last week → this week
+Week 2: BoW/TF-IDF baselines + error analysis discipline
+Week 3: embeddings + nearest neighbors retrieval
+Same mindset: build → measure → inspect failures → iterate
+1
+Meaning as geometry
+EMBEDDINGS
+The core idea
+Text → vector (a point in high-dimensional space)
+Similar meaning → nearby vectors
+Retrieval becomes “nearest neighbors”
+You can build products without generating text (yet)
+EMBEDDINGS
+An Example
+EMBEDDINGS
+Word Doc Matrix
+EMBEDDINGS
+The Problem with Vector Space Model 
+SIMILARITY
+Document similarity (intuition)
+Compare direction, not length
+Small angle → similar meaning
+Larger angle → less similar
+Users experience this as “better matching”
+SIMILARITY
+Document similarity (intuition)
+
+Euclidian Distance
+dist(q,d1) < dist(d1,d2)
+Non-similar documents closer than similar ones?
+Bad idea! because distance is large for vectors of different lengths
+(words should matter, not the size of documents)
+EMBEDDINGS
+Length Normalization
+A vector can be (length-) normalized by dividing each of its components by its length – for this we use the L2 norm:
+Dividing a vector by its L2 norm makes it a unit (length) vector
+
+
+Effect on the documents d and d′ (d appended to itself) from earlier:
+They have identical vectors after length-normalization!
+Long and short documents now have comparable weights
+COSINE
+Normalization: why we do it
+Normalized vectors make cosine similarity easy
+Dot product on normalized vectors ≈ cosine similarity
+Stabilizes comparisons across texts of different lengths
+Visual: “cosine similarity angle diagram” (search: cosine similarity vectors)
+EMBEDDINGS
+Cosine Similarity
+Dot product
+Cosine Distance = 1 – Cosine Similarity
+EMBEDDINGS
+Cosine Similarity
+SIMILARITY
+Use angle instead of distance
+Thought experiment: take document d and append it to itself. 
+Call this document d′.
+
+“Semantically” d and d′ have the same content
+The Euclidean distance between the two documents can be quite large
+The angle between the two documents is 0
+Should correspond to maximal similarity.
+
+Key idea: Measure “distance” according to angle between docs
+EMBEDDINGS
+Distance Matrix
+EMBEDDINGS
+What is an embedding?
+A learned representation that compresses meaning into numbers
+Same model maps many texts into the same coordinate system
+The goal: preserve semantic relationships
+Visual: “embedding pipeline diagram” (search: embedding model diagram)
+INTUITION
+Why vectors can encode meaning
+Meaning shows up through usage patterns (context)
+Similar contexts → similar vectors
+Works well for paraphrases + synonyms
+Breaks on rare entities unless the model has seen them
+BASELINES
+TF-IDF vs embeddings (what changes?)
+TF-IDF: exact tokens + weights
+Embeddings: semantic similarity (paraphrase-friendly)
+TF-IDF can win on exact matches and identifiers
+Best practice: keep both in your toolkit
+EMBEDDINGS
+Word vs sentence vs document embeddings
+Word: “bank” ≠ “bank” (river vs finance) problem
+Sentence/document: captures meaning of the full unit
+Today’s choice: short docs → document-level vectors
+Later: long docs → chunking + retrieval + reranking
+EMBEDDINGS
+Word2Vec
+A bottle of tezguino is on the table.
+Everybody likes tezguino.
+Tezguino makes you drunk.
+We make tezguino out of corn.
+What does tezguino mean?
+Loud, motor oil, tortillas, choices, wine
+You shall know a word by the company keeps.
+(Firth, 1957)
+EMBEDDINGS
+
+Embedding
+EMBEDDINGS
+Similar Meaning = Close
+EMBEDDINGS
+They “know” Tenses!
+swimming – walking + walked
+swam
+walking : walked :: swimming :
+swam
+EMBEDDINGS
+They “know” Tenses!
+Capital – Country +  Spain
+Madrid
+EMBEDDINGS
+Evolution of Language
+EMBEDDINGS
+Evolution of Language
+TODAY’S CHOICE
+Why “full documents as vectors” today
+Keeps the lab fast and conceptually clean
+Short finance Q&A posts fit in one embedding
+Lets you focus on evaluation and failure analysis
+Chunking returns in Week 5 (RAG)
+GEOMETRY
+Neighborhoods in embedding space
+Similar concepts form clusters (“fees”, “expense ratio”, “costs”)
+Different topics form separated regions (“tax”, “dividends”, “retirement”)
+Visual: “embedding clusters scatterplot illustration” (search: embedding space clusters)
+WHEN IT WORKS
+Why embeddings beat keywords
+Synonyms: “fees” ≈ “charges” ≈ “expense ratio”
+Paraphrase: “avoid penalties” vs “no early withdrawal penalty”
+Typos and variants
+Intent similarity (“compare”, “choose”, “difference between”)
+WHEN IT FAILS
+When embeddings struggle
+Entities/tickers: “VOO”, “QQQ”, “SPY”
+Numeric constraints: “$200/month”, “10-year horizon”
+Very short queries with little context
+Highly domain-specific jargon not seen in training
+PRACTICAL
+Choosing an embedding model (today)
+Lightweight model for speed (class setting)
+Normalize embeddings for cosine retrieval
+Better models exist, but iteration speed matters
+Principle: baseline first, then upgrade
+2
+Semantic Search
+RETRIEVAL
+Nearest neighbors: the retrieval primitive
+Given a query vector, find the closest document vectors
+Return top-k results
+This powers semantic search, matching, recs, and clustering
+Visual: “kNN diagram” (search: k nearest neighbors)
+RETRIEVAL
+Nearest neighbors: the retrieval primitive
+Given a query vector, find the closest document vectors
+Return top-k results
+This powers semantic search, matching, recs, and clustering
+Visual: “kNN diagram” (search: k nearest neighbors)
+TOP-K
+Why we return top-k (not just top-1)
+Top-1 may be wrong; top-k gives options
+Recall@k captures “did we include something relevant?”
+UI can show top results + allow refinement
+Retrieval is a ranking problem
+INDEXING
+Why we need a vector index
+Brute force search is slow at scale
+Indexes accelerate nearest neighbor search
+Today: simple indexes that run in Colab
+Production: approximate search + filters + rerankers
+PIPELINE
+Retrieval pipeline (end-to-end)
+1) Choose corpus (finance posts)
+2) Embed corpus (once)
+3) Build index
+4) Embed query
+5) Retrieve top-k and inspect results
+PRODUCT THINKING
+The “retrieval contract”
+Input: user intent in natural language
+Output: relevant evidence candidates (not final truth)
+Must be measurable (Recall/MRR)
+Must be debuggable (failure categories)
+EVAL
+Recall@k (did we include something relevant?)
+Recall@5 = 1 if any relevant doc appears in top 5
+High Recall@k is necessary for good UX
+But Recall alone ignores ranking quality
+You’ll compute Recall@5 today
+EVAL
+MRR@k (how high did the first relevant appear?)
+MRR rewards relevant results appearing near the top
+Users rarely read beyond top 1–3
+Improving MRR often improves perceived quality
+You’ll compute MRR@5 today
+3
+Patterns powered by embeddings
+PATTERNS
+Pattern 1 — FAQ matching / finance Q&A
+User asks: “What’s an expense ratio?”
+Retrieve: relevant finance explanation(s)
+Show top results with short snippets
+Optional: ask clarifying questions if ambiguous
+PATTERNS
+Pattern 2 — Routing and triage
+Classify by similarity to known categories (“tax”, “retirement”, “fees”)
+Route to the right workflow/agent/human
+Use metadata filters (account type, jurisdiction)
+Measured by routing accuracy + resolution time
+PATTERNS
+Pattern 3 — Duplicate detection
+Find near-duplicate questions/posts
+Reduce repeated work; improve knowledge bases
+Combine with human review for safety
+Works well even when wording differs
+PATTERNS
+Pattern 4 — Clustering for insight
+Cluster questions by theme (“dividends”, “taxes”, “retirement”)
+Identify top drivers of confusion
+Create better content/UX flows
+Visual: “cluster bubbles” (search: text clustering visualization)
+PATTERNS
+Pattern 5 — Similarity recommendations
+Recommend “related questions” or “next best articles”
+Great for cold-start (no behavior data needed)
+Add explainability: “recommended because similar to…”
+Evaluate with offline ranking metrics

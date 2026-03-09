@@ -1,0 +1,805 @@
+BANA 275
+Large Language Models
+& Prompt Engineering
+Module: Foundations of LLMs + The Art of Prompting
+Vibhanshu Abhishek, PhD
+CEO, Alltius | Associate Professor, UC Irvine
+1
+Today's Agenda
+Foundations of LLMs — history, definitions, key players
+How LLMs Work — tokenization, transformers, generation
+Why "GPT"? — unpacking the acronym
+Prompt Engineering Fundamentals
+Advanced Prompting — CoT, ToT, ReAct
+Prompt Security — attacks, guardrails, defenses
+Hands-on Demo — Gemini API
+2
+Part 1
+Foundations of
+Large Language Models
+3
+What is a Language Model?
+A probability distribution over sequences of words
+
+P( next word | previous words )
+"The cat sat on the ___" → mat (0.4), floor (0.2)...
+Given context, predict what comes next
+Trained on massive text data (internet, books, code)
+Learn patterns, grammar, facts, reasoning implicitly
+"Large" = billions of parameters learning these patterns
+4
+Building a Language Model
+4
+Brief History of Language Models
+
+1950s-80s
+Rule-Based
+
+1990s-00s
+Statistical
+
+2010s
+Neural
+
+2017+
+Transformers
+2017: "Attention Is All You Need" introduces Transformer
+2018: GPT-1 and BERT demonstrate pre-training power
+2020+: GPT-3, ChatGPT, Claude — LLMs go mainstream
+5
+Pre-training + Fine-tuning Paradigm
+
+Phase 1: Pre-training
+• Train on massive unlabeled text
+• Learn language patterns, facts
+• Self-supervised: predict next word
+• Expensive: millions of $$$
+
+Phase 2: Fine-tuning
+• Adapt to specific tasks
+• Smaller labeled datasets
+• RLHF: align with human preferences
+• Much cheaper than pre-training
+This is why you can use GPT-4 without training from scratch
+6
+Key LLM Families
+
+GPT-4 / GPT-4o
+OpenAI
+Strong reasoning, multimodal
+
+Claude 3.5
+Anthropic
+Long context, coding, safety
+
+Gemini
+Google
+Native multimodal, Google integration
+
+Llama 3
+Meta
+Open weights, customizable
+
+Mistral
+Mistral AI
+Efficient, open source
+Note: This landscape changes rapidly
+7
+Scale: The Engine of Progress
+175B+
+Parameters
+1T+
+Training Tokens
+$100M+
+Training Cost
+
+Scaling Laws: More parameters + data + compute = predictably better
+8
+Part 2
+How LLMs Work
+9
+Tokenization: Words → Numbers
+
+"Hello, how are you?" → [15496, 11, 703, 527, 499, 30]
+Subword Tokenization (BPE)
+Breaks words into subwords: "playing" → ["play", "ing"]
+Handles rare words efficiently
+Fixed vocabulary (~50K tokens) covers all text
+10
+Predicting the next Token
+
+"Hello, how are you?" → [15496, 11, 703, 527, 499, 30]
+Subword Tokenization (BPE)
+Breaks words into subwords: "playing" → ["play", "ing"]
+Handles rare words efficiently
+Fixed vocabulary (~50K tokens) covers all text
+10
+The Transformer Architecture
+"Attention Is All You Need" (2017)
+
+Encoder-Only
+BERT
+
+Decoder-Only
+GPT, Claude
+
+Encoder-Decoder
+T5, BART
+Most modern LLMs (GPT, Claude, Gemini) are decoder-only
+Key Components:
+• Self-Attention: Each word looks at all other words
+• Feed-Forward Networks: Process attended information
+• Layer Stacking: Repeat many times (GPT-4 has 100+ layers)
+11
+How do LLMs work?
+Autoregressive Generation
+LLMs generate text one token at a time
+
+"The quick brown" → fox
+"The quick brown fox" → jumps
+"The quick brown fox jumps" → over
+"The quick brown fox jumps over" → the
+Key Insight:
+Each new token is added to context for next prediction
+Model can only see past tokens — never the future
+This is why LLMs can produce coherent long-form text
+14
+Transformers (NOT the movie)
+
+DECODERS
+
+ENCODERS
+
+EMBEDDINGS
+
+
+OUTPUT
+I    am      a        student
+
+INPUT
+Je    suis     étudiant
+
+
+
+
+
+The Transformer Architecture
+Three components – Position Encoding
+12
+1. Positional Encodings
+[("Dale", 1), ("says", 2), ("hello", 3), ("world", 4)]
+
+2. Attention: allows a text model to “look at” every single word in the original sentence when deciding about how to translate words in the output sentence
+
+3. Self-attention
+Attention
+
+Attention allows a text model to “look at” every single word in the original sentence when deciding how to translate words in the output sentence
+
+12
+It’s a sort of heat map that shows where the model is “attending” when it outputs each word in the French sentence. As you might expect, when the model outputs the word “européenne,” it’s attending heavily to both the input words “European” and “Economic.”
+Self-Attention: The Key Intuition
+
+"The cat sat on the mat because it was tired."
+When processing "it" → attention focuses on "cat" (not "mat")
+The Spotlight Analogy
+For each word, a spotlight highlights relevant context
+Brightness = attention weight (how much to focus)
+Happens in parallel — that's why transformers are fast
+12
+Self-Attention: Another Example
+Server, can I have the check?”
+
+“Looks like I just crashed the server.”
+
+The word server here means two very different things, which we humans can easily disambiguate by looking at surrounding words. Self-attention allows a neural network to understand a word in the context of the words around it.
+
+Self-attention help neural networks disambiguate words, do part-of-speech tagging, entity resolution, learn semantic roles and a lot more.
+12
+Why "GPT"?
+Generative Pre-trained Transformer
+G
+Generative
+Creates content token-by-token
+P
+Pre-trained
+Learned from massive data first
+T
+Transformer
+Architecture enabling scale
+
+GPT-1 (2018) → GPT-2 (2019) → GPT-3 (2020) → GPT-4 (2023)
+13
+Why "GPT"?
+Generative Pre-trained Transformer
+G
+Generative
+Creates content token-by-token
+P
+Pre-trained
+Learned from massive data first
+T
+Transformer
+Architecture enabling scale
+
+GPT-1 (2018) → GPT-2 (2019) → GPT-3 (2020) → GPT-4 (2023)
+13
+One model for multiple tasks
+
+Summarization
+
+Comparison
+
+Sentence Completion
+
+Entity Recognition
+
+Q&A
+
+Code Generation
+17
+Emergent Capabilities
+Abilities that appear "suddenly" at scale
+In-context learning: Learn tasks from examples in prompt
+Chain-of-thought: Step-by-step problem solving
+Code generation: Write programs in many languages
+Multilingual transfer: Skills work across languages
+Tool use: Learn to call APIs and run code
+
+Why does predicting next words lead to reasoning?
+This is still an open research question.
+15
+Emergent Capabilities
+
+15
+Cross-Sector Impact
+From X% efficiency increase to X times productivity increase
+
+Customer Support
+100X faster help
+75% reduction in teams
+
+Programming
+10X faster development
+AI pair programming
+
+Healthcare
+Faster diagnosis
+Research acceleration
+
+Design
+Instant prototypes
+Creative iteration
+
+Education
+Personalized tutoring
+24/7 availability
+
+Research
+Literature review
+Hypothesis generation
+18
+Customer Support
+100X faster help
+75% reduction in CX teams
+Programming
+A New “Work” Order?
+What are top 20 jobs GPT4 would replace in the next 2 years, and the human skills it would need to have to replace them?
+Part 3
+Prompt Engineering
+Fundamentals
+16
+What is a Prompt?
+A way of instructing the LLM
+
+Simple Prompt
+Write a haiku on NLP.
+
+Complex Prompt
+You are a tax accountant.
+Guide a new business owner
+through their obligations...
+Prompt Engineering Principles:
+Clarity — Clear wording and context
+Conciseness — Short, focused instructions
+Guidance — Provide examples of desired output
+Consistency — Control style, tone, detail level
+21
+Which Prompt is Better?
+
+Prompt 1:
+"You work as a financial analyst for a retail company. Analyze the
+profitability of Apple iPhones for the past three quarters by calculating
+key financial ratios, conducting a cost analysis, and identifying any
+areas of inefficiency. Provide strategic recommendations."
+
+Prompt 2:
+"Analyze the profitability of Apple iPhones."
+Prompt 1 is better: Role, context, specific tasks, and desired output format
+22
+An Example
+17
+Hi, I'd like a refund for the coffee maker I ordered. Would that be possible?
+
+This is a conversation between a customer and a polite, helpful customer service agent. Question of the customer: Hi, I'd like a refund for the coffee maker I ordered. Would that be possible?
+
+This is a conversation between a customer and a polite, helpful customer service agent. Question of the customer: Hi, I'd like a refund for the coffee maker I ordered. Would that be possible? Response by the customer service agent: Hello, thank you for reaching out to us. Yes,
+Anatomy of a Prompt
+17
+System vs User Prompts
+
+System Prompt
+• Sets overall behavior
+• Defines persona/constraints
+• Persists across conversation
+• Hidden from end users
+
+User Prompt
+• The actual request
+• Changes each turn
+• Visible in conversation
+• What the user types
+
+Example:
+System: "You are a helpful coding assistant."
+User: "Write a function to reverse a string"
+19
+Zero-Shot Prompting
+Asking the model to perform a task without providing examples
+
+Definition
+Asking the model to perform a task without providing examples.
+The model relies entirely on its pre-trained knowledge.
+Example:
+"Translate the following sentence into French: 'Knowledge is power.'"
+Best for: Simple, well-understood tasks where the model has strong prior knowledge
+9
+Few-Shot Prompting
+Providing examples within the prompt to guide the model
+
+Example:
+Translate the following sentences into Spanish:
+- "Good morning." → "Buenos días."
+- "How are you?" → "¿Cómo estás?"
+- "Thank you very much." → "Muchas gracias."
+
+Now translate: "See you tomorrow."
+Best for: Complex tasks requiring specific format or style guidance
+10
+Generation Parameters
+
+Temperature
+0.0 - 2.0
+Lower = deterministic, Higher = creative
+
+Top-p
+0.0 - 1.0
+Limits choices to top probability mass
+
+Max tokens
+1 - 128K+
+Maximum response length
+
+Stop sequences
+strings
+Tokens that end generation
+Quick Guide:
+Factual tasks (code, extraction): temperature = 0
+Creative tasks (writing, brainstorm): temperature = 0.7-1.0
+20
+Common Failure Modes
+
+Hallucination
+Invents facts
+Ask for sources, use RAG
+
+Instruction ignoring
+Wrong format
+Be explicit, add examples
+
+Verbosity
+Response too long
+Set length limits
+
+Refusal
+Won't help
+Add legitimate context
+
+Inconsistency
+Different answers
+Lower temperature
+Debugging tip: Make ONE change at a time
+21
+Part 4
+Advanced Prompting
+Techniques
+22
+Chain-of-Thought Prompting
+Encouraging the model to think through problems step-by-step
+
+Purpose: Improves reasoning and complex problem-solving
+Example:
+"Calculate the total cost of 15 items at $7 each, with 5% tax.
+Show your work step-by-step."
+Applications:
+Math & Logic problems | Story understanding | Fact-checking | Complex query answering
+13
+Chain-of-Thought: Example
+"How many legs do four cats and two birds have?"
+
+Without CoT
+Model directly answers:
+
+"20 legs."
+
+(May be wrong!)
+
+With CoT
+"Let me work through this:
+• 4 cats × 4 legs = 16
+• 2 birds × 2 legs = 4
+• Total: 16 + 4 = 20 ✓"
+The magic phrase: "Let's think step by step"
+14
+Tree-of-Thought Prompting
+Exploring multiple reasoning paths before arriving at a conclusion
+
+CoT: Linear
+Step 1 → Step 2 → Step 3
+         ↓
+     Answer
+
+ToT: Branching
+     Problem
+    /   |   \
+  A     B     C
+ / \   / \
+A1 A2 B1 B2
+        ↓
+    Best Path
+Best for: Decision-making, brainstorming, optimization problems
+15
+Tree-of-Thought: Example
+"How can we arrange a dinner party so everyone has a good time?"
+
+Guest List
+
+Close friends only
+Mix of friends & acquaintances
+
+Menu
+
+Full-course dinner
+Potluck style
+
+Seating
+
+Assigned seats
+Open seating
+
+Entertainment
+
+Organize games
+Hire musician
+Open discussion
+Each branch is evaluated → Best combination selected → Optimal plan created
+16
+Tree-of-Thought: Example 2
+
+Prompt:
+"You have a 5-liter jug and a 3-liter jug. Measure exactly 4 liters.
+Use Tree-of-Thought: consider all possible actions at each step."
+
+Response:
+Branch 1: Fill 5L jug first          Branch 2: Fill 3L jug first
+    ↓                                     ↓
+Pour into 3L → 2L left in 5L         Pour into 5L → repeat...
+    ↓                                     ↓
+Empty 3L, pour 2L into 3L            (longer path)
+    ↓
+Fill 5L again
+    ↓
+Pour into 3L (has 2L space)
+    ↓
+5L jug now has exactly 4L ✓
+
+Branch 1 is optimal: 6 steps vs 8+ steps
+16
+Role Playing & Personas
+Assigning the model a specific role to influence its responses
+Definition: Assign a role or persona to the model
+Purpose: Tailors response style, tone, and content
+Effect: Activates domain-specific knowledge
+
+Example:
+"You are a cybersecurity expert. Explain to a non-technical audience
+how to protect their personal data online."
+17
+Role Playing: More Examples
+
+Creative Writing
+"Write a short horror story set in a deserted amusement park."
+No role needed — task defines the style
+
+Technical Explanation
+"As a data scientist, explain the concept of overfitting
+in machine learning models."
+Role shapes vocabulary, depth, and assumptions about audience
+18
+Using Analogies
+
+Prompt:
+"Explain the laws of thermodynamics using a cooking analogy."
+
+Response:
+"First law: You can't cook more than the total ingredients you have.
+
+Second law: Your kitchen will always get messier unless you clean it.
+
+Third law: You can't reach absolute zero dishes in the sink."
+19
+Self-Consistency
+Sample multiple reasoning paths, take majority vote
+
+Same prompt → Run 5 times → Different paths
+
+Path 1: 42 ✓    Path 2: 42 ✓    Path 3: 38    Path 4: 42 ✓    Path 5: 40
+
+→ Final Answer: 42 (3/5 majority)
+Trade-off: Higher accuracy but 5x the cost and latency
+Best for: High-stakes decisions where accuracy matters most
+24
+ReAct: Reasoning + Acting
+Interleave thinking with tool use
+
+Thought: I need to find Apple's stock price
+Action:  search("AAPL stock price")
+Observation: AAPL trading at $178.50
+Thought: Now I can calculate market cap...
+Action:  calculate(178.50 * 15.5B)
+Thought: Model reasons what to do | Action: Call a tool | Observation: Result feeds back
+26
+ReAct: Example 1
+
+Question: "What is the GDP per capita of the country where the Eiffel Tower is located?"
+
+ReAct Process:
+Thought 1: I need to find which country the Eiffel Tower is in.
+Action 1:  search("Eiffel Tower location")
+Observe 1: The Eiffel Tower is located in Paris, France.
+
+Thought 2: Now I need to find France's GDP per capita.
+Action 2:  search("France GDP per capita 2024")
+Observe 2: France's GDP per capita is approximately $44,408.
+
+Thought 3: I have the answer.
+Action 3:  finish("The GDP per capita of France, where the
+           Eiffel Tower is located, is ~$44,408.")
+21
+ReAct: Example 2
+
+Task: "Find the best-rated Italian restaurant near me and make a reservation for 2 at 7pm."
+
+ReAct Process:
+Thought 1: I need to search for Italian restaurants nearby.
+Action 1:  search_restaurants(cuisine="Italian", sort="rating")
+Observe 1: Top result: "Trattoria Milano" - 4.8★, 0.5 miles
+
+Thought 2: This looks good. Check if they have availability.
+Action 2:  check_availability("Trattoria Milano", time="7pm", party=2)
+Observe 2: Available: 6:45pm, 7:15pm, 8:00pm
+
+Thought 3: 7:15pm is closest. Make the reservation.
+Action 3:  make_reservation("Trattoria Milano", "7:15pm", party=2)
+Observe 3: Confirmed! Reservation #12345
+22
+Structured Output (JSON/XML)
+
+Prompt:
+Extract entities. Return JSON:
+{name, type, confidence}
+
+Text: "Tim Cook at Apple"
+
+Output:
+[{"name": "Tim Cook",
+  "type": "PERSON",
+  "confidence": 0.98}]
+Tips: Show complete example format, use API response_format, always validate output
+28
+Prompt Chaining
+Break complex tasks into smaller steps
+
+1
+Extract
+→
+
+2
+Analyze
+→
+
+3
+Generate
+→
+
+4
+Review
+Benefits:
+• Reliability: Each step simpler, less likely to fail
+• Debuggability: See where things go wrong
+• Cost efficiency: Use cheaper models for simple steps
+29
+Prompting Techniques Summary
+
+Technique
+Best For
+Trade-off
+
+Zero-shot
+Simple tasks
+Fast but less accurate
+
+Few-shot
+Custom formats
+Better accuracy, more tokens
+
+Chain-of-Thought
+Math, logic
+Slower but reliable
+
+Tree-of-Thought
+Complex puzzles
+Expensive but thorough
+
+Self-Consistency
+High stakes
+5x cost, higher accuracy
+
+ReAct
+Tool use
+Requires integration
+Start simple, add complexity only when needed
+30
+Part 5
+Prompt Security
+& Guardrails
+31
+Why LLMs Are Vulnerable
+No true understanding: LLMs predict tokens, not "understand" intent
+Trained on everything: Including adversarial content
+Helpful by design: Will try to help even malicious requests
+Context is text: System prompts can be overridden
+
+Key Insight: Security means appropriately constraining helpfulness
+32
+Common Attack Patterns
+
+Prompt Injection
+"Ignore previous instructions..."
+
+Role-Playing
+"Pretend you're an evil AI..."
+
+Context Manipulation
+Hidden instructions in user data
+
+Encoding Tricks
+Base64, pig latin, other languages
+
+Gradual Escalation
+Start innocently, push boundaries
+33
+Defense Strategies: Guardrails
+
+Input
+Validate, sanitize, filter attacks
+
+Prompt
+Clear boundaries, instruction hierarchy
+
+Model
+RLHF training, refusal patterns
+
+Output
+Content filtering, PII detection
+
+Reality: No perfect defense. Security is a cat-and-mouse game.
+Defense in depth + monitoring + rapid response
+34
+Best Practices for Secure Prompts
+Separate data from instructions
+Use delimiters: <user_input>...</user_input>
+Instruct model to be skeptical of user content
+Validate outputs before programmatic use
+Log and monitor for unusual patterns
+Test adversarially before deployment
+Assume users will try to break your system
+35
+Part 6
+Hands-on Demo:
+Prompting with Gemini
+36
+Setting Up Gemini in Colab
+
+# Install
+!pip install google-generativeai
+
+# Configure
+import google.generativeai as genai
+genai.configure(api_key="YOUR_KEY")
+
+# Use
+model = genai.GenerativeModel('gemini-1.5-flash')
+response = model.generate_content("Hello!")
+print(response.text)
+Get your API key: ai.google.dev | Free tier: 60 requests/minute
+37
+Exercise 1: Zero-Shot vs Few-Shot
+Task: Classify movie reviews as positive, negative, or neutral
+
+Zero-Shot:
+Classify: "Meh, it was okay"
+
+Few-Shot:
+"Great!" → pos
+"Terrible" → neg
+"Meh" → ?
+Try: Run both on 5 reviews, compare accuracy, test edge cases
+38
+Exercise 2: Chain-of-Thought
+
+Problem: Store sells apples for $2. Buy 5+, get 20% off.
+Sarah wants 3 for herself, 4 for friend.
+Should she buy together or separately?
+Try It:
+1. First without CoT — just ask for the answer
+2. Then add: "Let's think through this step by step"
+3. Compare the quality of reasoning
+39
+Exercise 3: Structured JSON Output
+
+Extract contact info. Return ONLY valid JSON:
+{"name": "...", "email": "...", "phone": "...", "company": "..."}
+
+Text: "Hi, I'm John Smith from Acme Corp.
+Reach me at john@acme.com or 555-123-4567."
+Experiment: Test with messy inputs — what breaks? How do you fix it?
+40
+Exercise 4: Temperature Exploration
+
+for temp in [0, 0.5, 1.0, 1.5]:
+    response = model.generate_content(
+        "Write a one-sentence robot story",
+        generation_config={"temperature": temp})
+    print(f"Temp {temp}: {response.text}")
+Observe: Run each 3 times. How consistent? When use each level?
+41
+Part 7
+Wrap-up &
+Next Steps
+42
+Key Takeaways
+LLMs are probability distributions over text, trained on massive data
+GPT = Generative Pre-trained Transformer — each word matters
+Self-attention lets models focus on relevant context
+Prompts have three components: instructions, context, examples
+Start simple, add complexity: zero-shot → few-shot → CoT → ToT
+Security is layered: input, prompt, model, output
+Experiment constantly — try, fail, iterate
+43
+Next Module: RAG
+Retrieval-Augmented Generation
+The problem with LLMs alone:
+• Knowledge cutoff — can't know recent events
+• Hallucinations — makes up facts confidently
+• No access to private/proprietary data
+RAG solves this by:
+• Retrieving relevant documents from a knowledge base
+• Injecting them into the prompt as context
+• Generating answers grounded in real sources
+You'll build your first RAG system next week!
+44
+Questions?
+vibs@uci.edu
+Office Hours: Wednesdays 2-3 PM
+46

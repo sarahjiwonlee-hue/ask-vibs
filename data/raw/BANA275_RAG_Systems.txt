@@ -1,0 +1,996 @@
+BANA 275
+RAG Systems
++ Guardrails
+Chunking, Retrieval, Citations, Memory & Injection Awareness
+Vibhanshu Abhishek, PhD
+CEO, Alltius | Associate Professor, UC Irvine
+1
+Today's Agenda
+– Why RAG? — LLM limitations and the retrieval solution
+– Document Processing & Chunking Strategies
+– Embeddings & Retrieval Techniques
+– Generation, Citations & Faithfulness
+– Guardrails & Injection Awareness
+– RAG Evaluation Metrics & Testing
+– Case Studies: Healthcare & Customer Support
+– Hands-on: Building a RAG System
+2
+Part 1
+Why RAG?
+3
+The Problem: LLM Limitations
+
+Knowledge Cutoff
+Training data has a fixed date — can't know recent events
+
+Hallucinations
+Confidently generates false information
+
+No Private Data
+Can't access your company's documents or policies
+
+No Citations
+Hard to verify where information came from
+
+Static Knowledge
+Can't be updated without expensive retraining
+These limitations make LLMs unreliable for enterprise use cases
+4
+The Solution: Retrieval-Augmented Generation
+Ground LLM responses in your own data
+
+1
+RETRIEVE
+Find relevant documents
+→
+
+2
+AUGMENT
+Add to prompt
+→
+
+3
+GENERATE
+LLM creates grounded response
+Result: Accurate, up-to-date, verifiable responses with citations
+5
+RAG Architecture Overview
+Indexing Pipeline (Offline)
+
+Documents
+→
+
+Chunk
+→
+
+Embed
+→
+
+Store
+Query Pipeline (Online)
+
+Query
+→
+
+Embed
+→
+
+Search
+→
+
+Retrieve
+→
+
+Augment
+→
+
+Generate
+
+Key Insight: Indexing happens once; querying happens every request
+6
+Data Indexing (Training)
+Data Retrieval & Generation
+Why RAG is Winning
+The dominant pattern for enterprise AI applications
+
+No Training Required
+Use existing LLMs + your data
+
+Always Up-to-Date
+Update knowledge base, not the model
+
+Verifiable
+Every answer traceable to sources
+
+Cost-Effective
+Fraction of fine-tuning cost
+
+Privacy-Preserving
+Data stays in your infrastructure
+80%+ of enterprise LLM deployments use some form of RAG
+7
+RAG vs Alternatives
+
+
+
+RAG
+
+Fine-tune
+
+Long Ctx
+
+Prompt
+
+Setup Cost
+
+Low
+
+High
+
+Low
+
+V.Low
+
+Update
+
+Instant
+
+Weeks
+
+Instant
+
+Instant
+
+Private Data
+
+✓
+
+✓
+
+✓
+
+✗
+
+Citations
+
+✓
+
+✗
+
+~
+
+✗
+
+Best For
+
+KB Q&A
+
+Style
+
+Few docs
+
+Simple
+RAG: best for accuracy + citations + easy updates
+8
+Part 2
+Document Processing
+& Chunking
+9
+Why Chunking Matters
+Documents are too large to fit in LLM context — we must break them down
+
+Too Small
+• Lost context
+• Fragmented meaning
+• More chunks to search
+
+Just Right
+• Complete thoughts
+• Semantic coherence
+• Efficient retrieval
+
+Too Large
+• Noise in retrieval
+• Diluted relevance
+• Higher token costs
+Chunking strategy directly impacts retrieval quality and answer accuracy
+10
+Chunking Strategies
+
+Fixed-Size
+Split by character/token count
+✓ Simple
+✗ Breaks sentences
+
+Recursive
+Split hierarchically (¶→sent→word)
+✓ Respects structure
+✗ More complex
+
+Semantic
+Split by meaning boundaries
+✓ Best coherence
+✗ Needs NLP
+
+Document-Aware
+Split by headers/sections
+✓ Preserves structure
+✗ Format-dependent
+
+Agentic
+LLM decides boundaries
+✓ Most intelligent
+✗ Slow, expensive
+Start with recursive chunking — it works well for most use cases
+11
+Fixed-Size Chunking
+Split text into equal-sized pieces by character or token count
+
+The quick brown fox jumps over the lazy dog. The dog was sleeping peacefully.
+↓ Split every 30 characters
+
+"The quick brown fox jump"
+
+"s over the lazy dog. The"
+
+" dog was sleeping peace"
+
+def fixed_chunk(text, size=500, overlap=50):
+    chunks = []
+    for i in range(0, len(text), size - overlap):
+        chunks.append(text[i:i + size])
+    return chunks
+Problem: Breaks words and sentences mid-way → poor semantic coherence
+12
+Recursive Chunking
+Split hierarchically: paragraphs → sentences → words
+
+Step 1: Try splitting by "\n\n" (paragraphs)
+↓ If chunks still too large...
+Step 2: Try splitting by ". " (sentences)
+↓ If chunks still too large...
+Step 3: Split by words
+
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500, chunk_overlap=50,
+    separators=["\n\n", "\n", ". ", " ", ""]
+)
+chunks = splitter.split_text(document)
+Best default choice — respects natural text boundaries
+13
+Semantic Chunking
+Split where meaning changes — using embeddings to detect boundaries
+
+Sent 1    Sent 2    Sent 3  |  Sent 4    Sent 5
+ [0.92]    [0.89]    [0.91] |   [0.45]    [0.88]
+                            ↑
+               Semantic boundary detected!
+
+def semantic_chunk(sentences, embeddings, threshold=0.7):
+    chunks, current = [], [sentences[0]]
+    for i in range(1, len(sentences)):
+        sim = cosine_sim(embeddings[i-1], embeddings[i])
+        if sim < threshold:  # Topic changed
+            chunks.append(' '.join(current))
+            current = []
+        current.append(sentences[i])
+    return chunks
+Best coherence but requires embedding computation during chunking
+14
+Document-Aware Chunking
+Respect document structure: headers, sections, pages
+
+Original Document
+# Chapter 1: Intro
+This chapter covers...
+
+## 1.1 Background
+The history of...
+
+## 1.2 Methods
+Our approach...
+
+# Chapter 2: Results
+→
+
+Resulting Chunks
+Chunk 1: [§1.1 Background]
+"This chapter covers...
+The history of..."
+
+Chunk 2: [§1.2 Methods]
+"Our approach..."
+
+Chunk 3: [Chapter 2]
+"Results show..."
+Metadata preserved: section titles, page numbers, hierarchy
+15
+Handling Special Content
+
+Tables
+Convert to markdown format
+Preserve row/column relationships
+Include table caption
+
+Images/Figures
+Extract captions and alt-text
+Use vision models for description
+Link figure references
+
+Code Blocks
+Keep code intact (don't split)
+Include documentation
+Preserve language metadata
+
+Lists
+Keep list items together
+Include list header
+Handle nested lists
+Don't just split — understand your document types
+16
+Chunk Size Guidelines
+Optimal size depends on your use case
+
+Use Case
+
+Chunk Size
+
+Overlap
+
+Why
+
+Q&A / Factoid
+
+256-512 tokens
+
+10-20%
+
+Precise retrieval
+
+Summarization
+
+1024-2048 tokens
+
+15-25%
+
+Broader context
+
+Conversation
+
+512-1024 tokens
+
+20%
+
+Balanced
+
+Code Search
+
+Function-level
+
+Minimal
+
+Keep units intact
+
+Legal/Medical
+
+512-768 tokens
+
+25%
+
+Accuracy critical
+
+Rule of thumb: Start with 512 tokens, 20% overlap — then tune
+17
+Why Overlap Matters
+Without Overlap:
+
+Chunk 1
+
+Chunk 2
+
+Chunk 3
+Information at boundaries gets lost!
+With 20% Overlap:
+
+Chunk 1
+
+Chunk 2
+
+Chunk 3
+
+
+Overlap zones preserve context across boundaries
+
+Overlap Guidelines:
+• 10-15%: Fast, less redundancy  • 20-25%: Balanced (recommended)
+• 30%+: Max context, higher storage cost
+18
+Metadata Enrichment
+Don't just store text — store context about the text
+
+{
+  "text": "Patients with diabetes should monitor...",
+  "metadata": {
+    "source": "clinical_guidelines_2024.pdf",
+    "page": 42,
+    "section": "Chapter 3: Diabetes Management",
+    "doc_type": "clinical_guideline",
+    "last_updated": "2024-01-15",
+    "author": "American Diabetes Association"
+  }
+}
+Benefits: Filter by date/source/section | Cite accurately | Debug retrieval
+19
+Part 3
+Embeddings &
+Retrieval
+20
+What are Embeddings?
+Converting text into numerical vectors that capture meaning
+
+"How do I reset my password?"
+↓ Embedding Model
+[0.023, -0.156, 0.892, ...]
+→
+
+Similar meaning = Similar vectors
+"I forgot my login credentials"
+has a vector close to the query
+→ High similarity score!
+Key Properties:
+• Semantic similarity = vector distance
+• Typical dimensions: 768 - 3072 (more = more nuance)
+• Once embedded, text can be searched mathematically
+21
+Vector Databases
+Purpose-built storage for high-dimensional vectors with fast similarity search
+Popular Options:
+
+Pinecone
+Fully managed
+
+Weaviate
+Open-source, hybrid
+
+ChromaDB
+Lightweight
+
+Qdrant
+High performance
+
+Milvus
+Enterprise-scale
+
+pgvector
+PostgreSQL ext
+
+Key features: ANN search, metadata filtering, real-time updates, billion-scale
+22
+Similarity Search
+
+Cosine Similarity
+Angle between vectors
+Range: -1 to 1
+Most common
+cos(θ) = A·B / ||A||||B||
+
+Dot Product
+Projection
+Faster compute
+Affected by magnitude
+A · B = Σ(ai × bi)
+
+Euclidean
+Straight-line distance
+Smaller = similar
+Dense embeddings
+d = √Σ(ai - bi)²
+Cosine similarity is the default for most RAG applications
+23
+Retrieval Strategies
+
+Dense Retrieval
+Uses embeddings
+
+✓ Semantic matching
+✓ Handles synonyms
+✗ Misses exact terms
+
+Sparse Retrieval
+Uses BM25/TF-IDF
+
+✓ Exact keyword match
+✓ No ML required
+✗ Misses semantics
+
+Hybrid Search
+Combines both!
+
+✓ Best of both worlds
+✓ Higher accuracy
+✗ More complex
+
+Hybrid: score = α × dense + (1-α) × sparse  |  Typical α = 0.5-0.7
+Recommendation: Use hybrid search for production
+24
+Query Expansion
+Improve retrieval by enriching the original query
+
+Original:
+"How do I fix login issues?"
+↓
+
+Expanded:
+"login issues password reset
+authentication error sign in
+troubleshoot access"
+Expansion Techniques:
+• Synonym injection
+• LLM rewriting
+• Multi-query generation
+• Historical query patterns
+• Pseudo-relevance feedback
+Query expansion improves recall by 15-30%
+25
+Re-ranking for Precision
+Two-stage: Fast recall → Precise re-ranking
+
+Query
+
+→
+
+Retrieve
+Top 50-100
+Fast
+→
+
+Re-rank
+Cross-Encoder
+~100ms
+→
+
+Return
+Top 5-10
+Precise
+Why Re-rank?
+• Bi-encoders (embeddings) are fast but less accurate
+• Cross-encoders see query + doc together → much more accurate
+• Cross-encoders too slow for entire corpus
+• Solution: bi-encoder for recall, cross-encoder for precision
+Popular: Cohere Rerank, ColBERT, BGE-Reranker
+26
+How Many Chunks to Retrieve?
+The top-k parameter: balancing context vs noise
+
+Too Few (k=1-2)
+• May miss info
+• Fragile
+• Good for facts
+• Lower cost
+
+Just Right (k=3-5)
+• Good coverage
+• Manageable noise
+• Works for most
+• Balanced
+
+Too Many (k=10+)
+• Introduces noise
+• Dilutes relevance
+• Higher cost
+• Confuses LLM
+
+Dynamic k strategies:
+• Similarity threshold: Only include chunks > 0.7 similarity
+• Adaptive: Start k=3, add more if confidence low
+27
+Part 4
+Generation,
+Citations & Memory
+28
+Context Injection
+How to structure retrieved context in the prompt
+
+system = """
+You are a helpful assistant. Answer using ONLY the context below.
+If answer not in context, say "I don't have information about that."
+
+Context:
+---
+[Source: guidelines.pdf, Page 42]
+{chunk_1}
+---
+[Source: faq.pdf, Page 12]
+{chunk_2}
+---
+
+Cite sources using [Source: filename, Page X] format.
+"""
+
+user = "What are the symptoms of diabetes?"
+Key: Clear instructions, source metadata, citation format, fallback behavior
+29
+Citation Techniques
+Making responses verifiable and trustworthy
+
+Inline Citations
+"Monitor glucose daily [1]."
+Clear format
+
+Source Attribution
+"Per the Guidelines (p.42)..."
+Natural flow
+
+Confidence
+"High confidence: doc states..."
+Transparency
+
+Quote + Cite
+"'Every 4 hours' (§3.2)"
+Direct evidence
+Best practice: Inline citations + references section
+30
+Ensuring Faithfulness
+Keeping the LLM grounded in retrieved content
+The Problem:
+LLMs may hallucinate beyond context, mixing retrieved facts with invented ones
+Solutions:
+
+Explicit Instructions:
+"Use ONLY the provided context"
+
+Quote Requirement:
+"Include direct quotes for claims"
+
+Confidence Scoring:
+"Rate confidence: High/Med/Low"
+
+Self-Check:
+"Verify each claim against sources"
+
+Output Validation:
+Post-process to check claims
+31
+Handling Edge Cases
+
+No Results
+"I don't have information about that.
+Would you like related topics?"
+Don't hallucinate
+
+Conflicting Sources
+"Source A says X, Source B says Y.
+The 2024 source suggests..."
+Acknowledge
+
+Partial Match
+"I found related info but not exactly.
+Here's what I know..."
+Be transparent
+
+Out of Scope
+"Outside my knowledge base.
+Please contact support."
+Escalate
+32
+Memory in RAG Systems
+Maintaining context across conversations
+
+Short-Term Memory
+• Current conversation context
+• Recent Q&A pairs
+• Session preferences
+• Sliding window of messages
+• Cleared after session
+
+Long-Term Memory
+• User preferences/history
+• Past interactions (summarized)
+• Learned user facts
+• Stored in vector DB
+• Persists across sessions
+
+When to forget: Privacy requests, outdated info, conversation reset
+Principle: Remember what helps, forget what doesn't
+33
+Part 5
+Guardrails &
+Injection Awareness
+34
+Security Risks in RAG
+New attack surfaces introduced by retrieval
+
+Prompt Injection via Docs
+Malicious instructions hidden in knowledge base
+
+Data Poisoning
+Attackers upload harmful content
+
+Information Leakage
+Sensitive data exposed through retrieval
+
+Access Control Bypass
+Users retrieving unauthorized docs
+
+Citation Manipulation
+Fake sources add false credibility
+Your knowledge base is now part of the attack surface
+35
+Defense Strategies
+
+Input Layer
+• Validate queries
+• Rate limiting
+• Authentication
+
+Retrieval Layer
+• Access control
+• Content filtering
+• Source trust scoring
+
+Generation Layer
+• Clear boundaries
+• Output filtering
+• PII detection
+
+Monitoring
+• Log all queries
+• Anomaly detection
+• Regular audits
+Defense in depth: No single layer is sufficient
+36
+RAG Security Best Practices
+
+1. Treat chunks as untrusted
+Never let retrieved content override system instructions
+
+2. Use delimiters
+Clearly separate system prompt from retrieved context
+
+3. Implement access control
+Filter retrieval results by user permissions
+
+4. Validate sources
+Only ingest documents from trusted origins
+
+5. Monitor continuously
+Track unusual query patterns and responses
+
+6. Test adversarially
+Red-team your system before deployment
+Security is a requirement, not a feature
+37
+Part 6
+RAG Evaluation
+& Testing
+38
+Why RAG Evaluation is Hard
+Multiple components, each can fail differently
+
+Retrieval Failures
+Right answer exists but wasn't retrieved
+
+Generation Failures
+Right chunks retrieved but LLM got it wrong
+
+Chunking Failures
+Answer split across chunks, incomplete
+
+Ranking Failures
+Right chunk retrieved but ranked too low
+
+Faithfulness Failures
+LLM hallucinated beyond retrieved content
+Evaluate both retrieval AND generation separately
+39
+Retrieval Metrics
+
+Recall@K
+% relevant docs in top K
+Did we FIND right chunks?
+
+Precision@K
+% of top K that are relevant
+How much NOISE?
+
+MRR
+Mean Reciprocal Rank
+How HIGH is right chunk?
+
+NDCG
+Normalized DCG
+Are BETTER ranked higher?
+Focus on Recall@K first — can't generate from missing chunks
+40
+Generation Metrics
+
+Faithfulness
+Is answer supported by context?
+Measures hallucination
+
+Answer Relevance
+Does answer address question?
+Measures responsiveness
+
+Context Relevance
+Were chunks actually useful?
+Measures retrieval
+
+Correctness
+Is answer factually correct?
+Needs ground truth
+
+RAGAS Framework: Open-source library that automates these metrics
+41
+Building a RAG Test Suite
+Golden Q&A pairs are the foundation of evaluation
+
+test_cases = [
+  {"question": "What are symptoms of Type 2 diabetes?",
+   "expected_answer": "Increased thirst, frequent urination...",
+   "expected_sources": ["diabetes_guide.pdf"],
+   "difficulty": "easy"},
+  {"question": "Compare treatment options for...",
+   "expected_answer": "...",
+   "difficulty": "hard"}
+]
+Test Categories:
+• Simple factual  • Multi-hop reasoning  • Negative tests (no answer)
+• Edge cases  • Adversarial queries  • Domain jargon
+Aim for 100+ diverse test cases before production
+42
+Continuous Evaluation
+
+Offline
+Before Deploy
+Run test suite on every change
+Catch regressions
+A/B test strategies
+
+Online
+In Production
+Track real user interactions
+Collect thumbs up/down
+Monitor hit rates
+
+Human
+Ongoing
+Sample for expert review
+Catch subtle issues
+Build ground truth
+
+RAG quality degrades over time as knowledge bases grow and change.
+Continuous evaluation catches drift before users notice.
+43
+Part 7
+Case Studies
+44
+Case Study: Healthcare
+Clinical Decision Support System
+
+The Challenge
+• Physicians need instant access to
+  clinical guidelines and drug interactions
+• 10,000+ pages of medical literature
+• Information changes frequently
+• Accuracy is life-or-death
+• Must cite authoritative sources
+• HIPAA compliance required
+
+Key Decisions
+• Document-aware chunking for
+  medical sections, tables, dosages
+• Chunk size: 512 tokens, 25% overlap
+• Hybrid search (semantic + exact)
+• Mandatory citations for every claim
+• Confidence thresholds: Low → escalate
+• Human-in-loop for critical decisions
+45
+Healthcare: Results & Learnings
+Results:
+92%
+Accuracy
+< 3 sec
+Response
+100%
+Citations
+40%
+Time Saved
+Key Learnings:
+1. Medical terminology requires domain-specific embeddings
+2. Tables and dosage charts need special chunking — don't split them
+3. "I don't know" is better than a wrong medical answer
+4. Audit trails are essential for healthcare compliance
+5. Regular revalidation as guidelines update
+46
+Case Study: Customer Support
+Automated Ticket Resolution
+
+The Challenge
+• 50,000+ support tickets per month
+• 500+ product FAQ articles
+• Inconsistent responses from agents
+• Long wait times frustrate customers
+• Knowledge scattered across systems
+• Queries range simple to complex
+
+Key Decisions
+• Recursive chunking for FAQ articles
+• Chunk size: 256 tokens (short, precise)
+• Query expansion for typos, slang
+• Escalation path to human agents
+• Feedback loop: thumbs up/down
+• A/B testing response templates
+• Multi-language support
+47
+Support: Results & Learnings
+Results:
+65%
+Auto-Resolve
+< 2 sec
+Response
+35%
+Cost Saved
+4.2/5
+CSAT
+Key Learnings:
+1. Short chunks work better for FAQ-style content
+2. Query expansion critical for handling customer typos and slang
+3. Confidence thresholds determine when to escalate to humans
+4. Feedback loops improve accuracy over time (10%+ gain in 3 months)
+5. Tone matters — empathetic responses score higher
+48
+Part 8
+Hands-on &
+Wrap-up
+49
+Hands-on: Build a RAG System
+What we'll build in the Colab exercise
+
+1
+Ingest
+Load sample docs
+
+2
+Chunk
+Recursive + metadata
+
+3
+Embed
+Vector store
+
+4
+Retrieve
+Hybrid search
+
+5
+Generate
+RAG prompt + cite
+
+6
+Evaluate
+Test edge cases
+Open the Colab notebook and follow along!
+50
+Key Takeaways
+RAG = Retrieve + Augment + Generate
+    The dominant pattern for grounding LLMs in enterprise data
+
+Chunking is critical
+    Start with recursive, 512 tokens, 20% overlap — then tune
+
+Hybrid retrieval beats dense-only
+    Combine semantic + keyword search for best results
+
+Citations build trust
+    Every claim should be traceable to a source
+
+Evaluate continuously
+    Retrieval metrics + generation metrics + human review
+51
+Questions?
+vibs@uci.edu
+Office Hours: Wednesdays 2-3 PM
+52

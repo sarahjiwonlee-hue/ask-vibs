@@ -1,0 +1,523 @@
+BANA 275
+NLP Applications - II:
+Recommender Systems, Q&A
+& Summarization
+Vibhanshu Abhishek, PhD
+CEO, Alltius | Associate Professor, UC Irvine
+1
+Today's Agenda
+2
+NLP for Recommender Systems: from TF-IDF to LLM-augmented
+Foundational text-based recommendation techniques
+Embedding-based approaches and the semantic revolution
+LLM-augmented recommendations in production
+LLM-Powered Question Answering
+LLM-Powered Summarization
+Hands-on: Building recommenders, Q&A, and summarizers with Gemini
+Part 1
+Recommender Systems
+& NLP
+3
+Why Recommendations Matter
+4
+
+35%
+of Amazon
+purchases from
+recommendations
+
+80%
+of Netflix views
+driven by
+recommendations
+
+60%
+of YouTube watch
+time from
+recommendations
+Recommendations are the core business driver for the world's largest platforms
+Traditional RecSys Approaches
+5
+
+Collaborative Filtering
+"Users who liked X also liked Y"
+Based purely on user-item interactions
+
+Content-Based Filtering
+Match item features to user preferences
+Relies on structured metadata
+
+Matrix Factorization
+Decompose user-item matrix into latent factors
+SVD, ALS, NMF techniques
+6
+Content-Based vs. Collaborative Filtering
+Two foundational approaches — each with distinct strengths and data requirements
+Where Traditional RecSys Breaks Down
+7
+Cold start: No history for new users or items
+Sparsity: Most users interact with <1% of items
+No text understanding: Can't process reviews, descriptions, or queries
+No explainability: "Users like you liked this" isn't satisfying
+No semantic similarity: Can't connect "lightweight trail shoe" to "hiking sneaker"
+8
+The richest signals about what
+users want and what items are
+live in unstructured text
+
+Product reviews
+
+Search queries
+
+Item descriptions
+
+Social media posts
+
+Support tickets
+9
+The Evolution of Recommendation Systems
+From simple user-item matrices to conversational, LLM-augmented recommendations
+Traditional vs. NLP-Enhanced RecSys
+10
+Keyword & TF-IDF Recommendations
+Content-based filtering using text features
+11
+How it works:
+Extract keywords from product descriptions or reviews
+Compute TF-IDF vectors for each item
+Recommend items with highest cosine similarity
+Strengths:
+Simple, interpretable, fast, no training data needed
+Great cold-start fallback in production systems
+Limitation:
+No semantic understanding — "running shoe" won't match "jogging sneaker"
+12
+TF-IDF: Finding Distinctive Words
+Topic Modeling for Recommendations
+Discovering latent themes with LDA
+13
+Concept:
+Discover hidden topics across item descriptions or user reviews
+Each item becomes a distribution over topics
+Match users to items based on topic affinity
+Example (movie reviews):
+Topic A: "action, hero, fight, explosion, chase"
+Topic B: "romance, love, relationship, heart, tears"
+User who reviews action films heavily → recommend Topic A items
+14
+Topic Modeling: Discovering Hidden Themes
+Sentiment & Opinion Mining
+Understanding how users feel about specific aspects
+15
+
+Example review: "Great battery life and amazing camera, but the screen is too small and the price is ridiculous."
+Match user priorities to product strengths —
+not just overall sentiment
+Entity & Attribute Extraction
+Turning unstructured text into structured, recommendable features
+16
+
+Recipes
+Ingredients, cuisine, cooking time, difficulty, dietary tags
+
+Hotels
+Amenities, location features, room types, guest sentiment
+
+Job Postings
+Skills required, experience level, industry, benefits
+
+Movies
+Genre, themes, director style, mood, era, cast
+NLP extracts the features that make each item unique and matchable
+Part 2
+From Words to Vectors
+17
+Word2Vec / GloVe for Item Representations
+Treating interaction sequences as sentences
+18
+The key insight:
+Treat user interaction history as a "sentence" where items are "words"
+Train Word2Vec to learn item embeddings from these sequences
+Real-world examples:
+Spotify: Song sequences → song embeddings for playlist generation
+Airbnb: Listing click sequences → listing embeddings for "similar homes"
+E-commerce: Purchase sequences → product embeddings for "you may also like"
+19
+Word Embeddings: Vector Arithmetic
+Sentence & Document Embeddings
+Semantic similarity beyond keyword matching
+20
+
+"lightweight trail running shoe with waterproof membrane"
+matches with
+"breathable hiking sneaker for wet conditions"
+Use sentence transformers (e.g., all-MiniLM-L6-v2) to encode:
+Product descriptions → dense vectors (384-768 dims)
+User reviews → aggregate preference vectors
+Search queries → intent vectors for real-time matching
+Fast nearest-neighbor search with FAISS or ChromaDB
+21
+Embedding Space Visualization
+Similar items cluster together — queries find nearest neighbors in vector space
+22
+Cosine Similarity in Embedding Space
+LLM Embeddings
+When do you need the upgrade?
+23
+
+Sentence Transformers
+Fast inference (~5ms)
+Small models (~80MB)
+384-768 dimensions
+Good for most use cases
+Run locally, low cost
+
+LLM Embeddings
+Slower (~100-500ms)
+API-dependent
+1536-3072 dimensions
+Better for nuanced queries
+Higher per-query cost
+Use LLM embeddings when nuance matters more than speed
+NLP Techniques: Tradeoffs
+24
+Choosing the Right Technique
+25
+In production: use multiple techniques at different pipeline stages
+Part 3
+LLM-Augmented
+Recommendations
+26
+27
+LLM-Augmented Recommender System
+Zero-Shot & Few-Shot Recommendation
+Prompting LLMs directly for recommendations
+28
+
+Prompt:
+"A user enjoyed The Shawshank Redemption, Inception, and The Dark Knight.
+They prefer movies with strong plots and psychological depth.
+Recommend 5 movies with brief explanations for each."
+Strengths: No training data, handles cold start, generates explanations
+Weaknesses: No real-time signals, limited by context window, costly at scale
+Best for: Prototyping, small catalogs, cold-start fallback
+Conversational Recommendation
+From "guess from clicks" to "ask and reason"
+29
+
+I want a movie for date night — something engaging but not too intense
+
+How about a smart thriller? Or would you prefer something more lighthearted?
+
+Smart thriller sounds good. We both liked Gone Girl
+
+Try Knives Out or The Invisible Guest — both have twisty plots without being too dark
+The paradigm shift: users express intent in natural language, not just clicks
+Explanation Generation
+LLMs explain why something was recommended
+30
+Traditional:
+"Users who watched X also watched Y"  —  Not helpful
+NLP-Enhanced:
+"Based on your interest in complex heist films, you might enjoy Knives Out — it features a similar puzzle-box structure with an ensemble cast and a satisfying twist."
+How it works in production:
+Traditional model generates candidates with scoring signals
+LLM takes user profile + item features + scoring rationale
+Generates natural language explanation for the recommendation
+LLM as Re-Ranker
+Refining candidates with deeper understanding
+31
+Each stage narrows results while increasing intelligence — LLMs only touch the final 10-20 items
+Evaluating Recommendations
+Beyond accuracy
+32
+Precision@K
+How many of the top K recommendations are relevant?
+
+Recall@K
+What fraction of relevant items appear in top K?
+
+NDCG
+Are the best items ranked highest? (order-aware)
+
+Diversity
+How different are the recommended items from each other?
+
+Novelty
+Are we showing items the user hasn't seen before?
+
+Coverage
+What % of the catalog ever gets recommended?
+Offline metrics are necessary but not sufficient — A/B test in production
+Case Study: Netflix Recommendations
+33
+
+The Challenge
+200M+ subscribers, 15,000+ titles, users make decisions in 60-90 seconds
+NLP Techniques Used
+Tag genome: NLP-extracted content tags from reviews and metadata
+Embeddings: Item and user embeddings for personalized ranking
+NLP for row titles: "Because you watched X" generated from content analysis
+Impact
+Estimated $1B/year in retained subscribers from recommendation quality
+34
+Netflix Recommendation Architecture
+Candidate generation → ranking → re-ranking with NLP-powered explainability
+35
+Not everything needs an LLM.
+Pick the right NLP tool for the
+stage and the constraint.
+TF-IDF for baselines  →  Embeddings for retrieval  →  LLMs for reasoning
+Part 4
+LLM-Powered
+Question Answering
+36
+Q&A Taxonomy
+37
+
+Extractive
+Select a span from the source text as the answer
+"The capital of France is Paris"
+
+Abstractive
+Generate a new answer by synthesizing information
+Produces novel text not found verbatim in source
+
+Generative (LLM)
+Generate answers from parametric knowledge or retrieved context
+Most flexible but requires faithfulness controls
+
+Also consider: Open vs. Closed domain  |  Single-hop vs. Multi-hop reasoning
+Closed-Book Q&A
+LLM answers from its parametric knowledge alone
+38
+
+User: "What year was the Eiffel Tower built?"
+LLM: "The Eiffel Tower was completed in 1889."
+When it works:
+General knowledge, well-known facts, simple lookups
+When it fails:
+Domain-specific questions, recent information, company policies
+Anything requiring citations or verifiability
+Hallucination risk is high and undetectable
+RAG-Based Q&A
+Retrieval-Augmented Generation — the production standard
+39
+
+User
+Question
+→
+
+Embed
+Query
+→
+
+Retrieve
+Documents
+→
+
+Augment
+Prompt
+→
+
+Generate
+Answer
+Key advantages over closed-book:
+Grounded in actual documents — answers are verifiable
+Can cite sources and provide evidence
+Knowledge stays current without retraining
+Domain-specific: just swap the document store
+40
+RAG Architecture in Detail
+Five-stage pipeline: query → embed → search → augment → generate
+Multi-Step Q&A
+Decomposing complex questions into sub-queries
+41
+
+"How does our Q3 revenue compare to competitors in the APAC region?"
+
+Step 1: Retrieve our Q3 revenue data
+
+Step 2: Identify APAC competitors
+
+Step 3: Retrieve competitor revenue for Q3
+
+Step 4: Synthesize comparison with analysis
+Complex questions require planning, multiple retrievals, and synthesis
+42
+Q&A Architectures Compared
+Three approaches with increasing complexity, accuracy, and grounding
+Prompt Engineering for Q&A
+43
+
+System Prompt Template:
+You are a helpful assistant that answers questions based ONLY on
+the provided context. If the context doesn't contain the answer,
+say "I don't have enough information to answer that."
+Always cite the source document for each claim.
+Key elements:
+Grounding instruction (answer from context only)
+"I don't know" behavior (refuse gracefully when unsure)
+Citation format (how to reference sources)
+Output format (length, structure, tone)
+Q&A Failure Modes
+What goes wrong in production
+44
+Test for these systematically — your 500-prompt test suite should include adversarial examples
+Evaluating Q&A Systems
+45
+Q&A Evaluation Metrics
+46
+Answer Correctness
+Is the answer factually accurate?
+
+Faithfulness
+Is the answer supported by the retrieved context?
+
+Completeness
+Does the answer fully address the question?
+
+Relevance
+Are the retrieved documents actually relevant?
+
+Latency
+Time from question to answer (target: <2 seconds)
+
+Cost per Query
+API costs, compute, and infrastructure per question
+Real-World Q&A Applications
+47
+
+Customer Support
+Automated FAQ, ticket deflection, agent assist
+40-60% ticket reduction
+
+Internal Knowledge
+Employee Q&A over company docs, HR policies
+Hours saved per employee/week
+
+Legal Research
+Case law search, contract analysis, compliance
+10x faster document review
+
+Healthcare
+Clinical decision support, patient FAQ
+Reduced wait times, better triage
+48
+Retrieval keeps LLMs honest.
+Evaluation keeps them useful.
+Part 5
+LLM-Powered
+Summarization
+49
+The Summarization Landscape
+50
+
+Extractive
+Select the most important
+sentences from the original text
+
+Highly faithful
+But can feel choppy and miss nuance
+
+Abstractive (LLM)
+Generate new text that captures
+the key information
+
+More fluent and coherent
+But risk of hallucination
+Output formats:
+
+TL;DR
+
+Bullet points
+
+Structured report
+
+Headlines
+
+Action items
+51
+Extractive vs. Abstractive — How They Work
+Extractive selects existing sentences; abstractive generates new text from understanding
+Summarization Use Cases
+52
+Legal document analysis: Contracts, filings, case law → key terms and risks
+Earnings call summaries: 1-hour transcript → key metrics and forward guidance
+Meeting transcripts: Auto-generate action items and decisions
+Customer review synthesis: 10,000 reviews → product strengths/weaknesses
+Research papers: Extract methodology, findings, and limitations
+News aggregation: Multiple articles → one balanced summary
+Prompt Engineering for Summaries
+53
+
+Control levers:
+Length: "Summarize in 3 sentences" vs "Provide a 500-word summary"
+Focus: "Focus on financial metrics" vs "Focus on strategic decisions"
+Audience: "For a technical audience" vs "For an executive summary"
+Format: "As bullet points" vs "As a narrative paragraph"
+Pro tip:
+"First list all key facts, then write a summary" (chain-of-thought)
+The Long-Context Challenge
+What happens when the document exceeds the context window?
+54
+
+Chunking
+Split document into overlapping chunks, summarize each, combine
+Pro: Simple  |  Con: Loses cross-section connections
+
+Map-Reduce
+Summarize each chunk independently, then summarize the summaries
+Pro: Scalable  |  Con: Information loss at each stage
+
+Hierarchical
+Build summary tree: paragraphs → sections → document
+Pro: Preserves structure  |  Con: More complex, higher cost
+55
+Map-Reduce Summarization Strategy
+Split → summarize each chunk independently → combine summaries into final output
+Faithfulness: The Core Risk
+56
+
+Original: "Revenue grew 12% to $4.2B, driven by cloud services."
+Faithful: "Revenue increased 12% to $4.2 billion, led by cloud growth."
+Unfaithful: "Revenue surged 15% to $4.5B, driven by AI product launches."
+Why it happens:
+LLMs optimize for fluency, not factual accuracy
+Numbers, dates, and names are especially vulnerable
+Longer documents = more room for drift from source material
+Summarization Evaluation
+57
+Summarization Metrics
+58
+ROUGE
+N-gram overlap with reference summaries. Simple but misses semantic quality.
+High ROUGE ≠ good summary
+BERTScore
+Semantic similarity using contextual embeddings. Better than ROUGE.
+Doesn't catch factual errors
+Factual Consistency
+Does the summary only state facts present in the source?
+Hard to automate reliably
+Human Evaluation
+Gold standard: fluency, coherence, informativeness, faithfulness
+Expensive, slow, subjective
+59
+A fluent summary that's unfaithful
+is worse than no summary at all.
+Always verify: numbers, names, dates, and causal claims
+Connecting the Three
+60
+These aren't isolated techniques — they compose in production:
+Recommender Systems use Summarization
+Generate concise explanations for why items are recommended
+Recommender Systems use Q&A
+Conversational recommendations are Q&A over a product catalog
+Q&A uses Summarization
+Long answers need to be summarized for the user; multi-doc Q&A synthesizes information
+Summarization uses Q&A
+Query-focused summarization is essentially answering "what matters?" about a document
+61
+Questions?
+vibs@uci.edu
+Office Hours: Wednesdays 2-3 PM, or by appointment

@@ -1,0 +1,896 @@
+Applications - Text ClassificationVibhanshu “VIBS” Abhishek
+BANA 275: Natural language processing
+NLP & LLMs
+Text Classification
+Definition and Applications
+Evaluation Metrics
+Rules and Supervised Algorithms
+2
+Text Classification
+BANA 275: ML for Text (Spring 2019)
+Definition and Applications
+Evaluation Metrics
+Rules and Supervised Algorithms
+3
+Text Classification: definition
+Input:
+ a document d
+ a fixed set of classes  C = {c1, c2,…, cJ}
+
+Output: a predicted class c  C
+BANA 275: ML for Text (Spring 2019)
+4
+Sentiment Analysis
+BANA 275: ML for Text (Spring 2019)
+5
+Filled with horrific dialogue, laughable characters, a laughable plot, ad really no interesting stakes during this film, "Star Wars Episode I: The Phantom Menace" is not at all what I wanted from a film that is supposed to be the huge opening to the segue into the fantastic Original Trilogy. The positives include the score, the sound …
+Content/Product Tagging
+• Commonly used in content-focused site
+e-commerce, news, online directory
+• Users usually put the content, & system suggests categories
+BANA 275: ML for Text (Spring 2019)
+6
+Spam Detection
+• Mostly used for emails
+• Can also be used in blog/website comment section
+BANA 275: ML for Text (Spring 2019)
+7
+Chatbots
+• Text classification is used to classify the users’ intents.
+• Based on the intents, chatbot will send the response.
+BANA 275: ML for Text (Spring 2019)
+8
+
+Subject of articles
+Antogonists and Inhibitors
+Blood Supply
+Chemistry
+Drug Therapy
+Embryology
+Epidemiology
+…
+
+BANA 275: ML for Text (Spring 2019)
+9
+MeSH Subject Category Hierarchy
+?
+MEDLINE Article
+
+Text Classification: Examples
+Best-studied benchmark: Reuters-21578 newswire stories
+9603 train, 3299 test documents, 80-100 words each, 93 classes
+BANA 275: ML for Text (Spring 2019)
+10
+ARGENTINE 1986/87 GRAIN/OILSEED REGISTRATIONS
+BUENOS AIRES, Feb 26
+Argentine grain board figures show crop registrations of grains, oilseeds and their products to February 11, in thousands of tonnes, showing those for future shipments month, 1986/87 total and 1985/86 total to February 12, 1986, in brackets:
+ Bread wheat prev 1,655.8, Feb 872.0, March 164.6, total 2,692.4 (4,161.0).
+ Maize Mar 48.0, total 48.0 (nil).
+ Sorghum nil (nil)
+ Oilseed export registrations were:
+ Sunflowerseed total 15.0 (7.9)
+ Soybean May 20.0, total 20.0 (nil)
+The board also detailed export registrations for subproducts, as follows.... 
+Categories: grain, wheat (of 93 binary choices)
+
+Other Examples
+BANA 275: ML for Text (Spring 2019)
+11
+Reviews of films, restaurants, products: positive vs. negative
+Amazon reviews data, IMDB reviews data
+Library-like subjects (e.g., the Dewey decimal system)
+News stories: politics vs. sports vs. business vs. technology ...
+20 newsgroup data (later today!)
+Author attributes: identity, political stance, gender, age, ...
+Email: spam vs. not
+Gmail: important, promotion, updates, social media, …
+What is the reading level of a piece of text?
+Automatic graders?
+How influential will a scientific paper be?
+Advertisement recommendations …
+Will a piece of proposed legislation pass?
+Identify the presidential candidate from speeches
+Post recommendations / Fake news detection
+Can majorly influence world-changing decisions!
+Text Classification
+BANA 275: ML for Text (Spring 2019)
+Definition and Applications
+Evaluation Metrics
+Rules and Supervised Algorithms
+12
+Evaluation
+BANA 275: ML for Text (Spring 2019)
+13
+Classification
+d
+Classifier, f
+Class c
+Contingency Table
+BANA 275: ML for Text (Spring 2019)
+14
+For any dataset D and classifier f, we compute the following table
+For now, we will consider binary classification, i.e. C ϵ {+, -}
+Predicted
++
+Predicted
+-
+Labeled +
+Labeled -
+Accuracy
+BANA 275: ML for Text (Spring 2019)
+15
+Predicted
++
+Predicted
+-
+Labeled +
+Labeled -
+In other words, proportion of correct predictions
+Accuracy of Spam Classifiers
+Classification accuracy: What % of messages were classified correctly
+Is this what we care about?
+
+
+Which system would you use? Why?
+BANA 275: ML for Text (Spring 2019)
+16
+Precision and recall
+Precision: % of selected items that are correct
+BANA 275: ML for Text (Spring 2019)
+17
+Recall: % of positive items that are selected
+Precision = 
+Recall = 
+Pred +
+Pred -
+Actual +
+Actual -
+Be precise,
+If you say you’re positive,
+you better be correct
+High recall,
+Are you able to recall all the positive data points?
+PR Curve: Spam Classification
+
+Can trade-off precision vs. recall by setting confidence threshold
+Measure the curve on annotated dev data (or test data)
+Choose a threshold where user is comfortable
+good messages kept
+good messages
+Recall =
+
+good messages kept
+messages kept
+Precision =
+PR Curve
+high threshold:
+all we keep is good,
+but we don’t keep much
+(never show -ive results)
+low threshold:
+keep all the good stuff,but a lot of the bad too
+(never miss +ive results)
+Better for Spam
+Better for Search
+Combining Precision and Recall
+BANA 275: ML for Text (Spring 2019)
+Average?
+Minimum?
+20
+For the selected threshold, how can we combine precision and recall into a single number
+F1 Score: Harmonic Mean
+BANA 275: ML for Text (Spring 2019)
+Harmonic Mean
+21
+F1 Score = 
+What if we care about one more than the other?
+Weighted F Score
+BANA 275: ML for Text (Spring 2019)
+22
+Recall is more imp.
+Precision is more imp.
+More Than Two Classes
+For each class c ∈ C
+Build a classifier fc to distinguish c from all other classes c’ ∈ C
+Given a document d, 
+Evaluate it for membership in each class using each fc
+d belongs to the class for which fc is the highest
+BANA 275: ML for Text (Spring 2019)
+Sec.14.5
+Confusion matrix, M
+For each pair of classes c1,c2 how many documents from c1 were incorrectly assigned to c2?
+24
+BANA 275: ML for Text (Spring 2019)
+Extend contingency table to multiple classes
+Per class evaluation measures
+Recall(i): 
+    Fraction of docs in class i classified correctly:
+
+Precision(i): 
+    Fraction of docs assigned class i    that are actually about class i:
+
+
+Overall Accuracy:
+       Fraction of docs classified correctly:
+BANA 275: ML for Text (Spring 2019)
+Sec. 15.2.4
+Micro- vs. Macro-Averaging
+How do we combine multiple performance measures into one quantity?
+Macroaveraging: Compute performance for each class, then average.
+
+
+
+Microaveraging: Collect all decisions, compute 1 contingency table.
+
+BANA 275: ML for Text (Spring 2019)
+Sec. 15.2.4
+…
+Micro- vs. Macro-Averaging: Example
+BANA 275: ML for Text (Spring 2019)
+Class 1
+Class 2
+Micro Ave. Table
+Sec. 15.2.4
+Macroaveraged precision: (0.5 + 0.9)/2 = 0.7
+Microaveraged precision: 100/120 = .83
+Microaveraged score is dominated by score on common classes
+Scikit-Learn API
+http://scikit-learn.org/stable/modules/model_evaluation.html#precision-recall-f-measure-metrics
+BANA 275: ML for Text (Spring 2019)
+28
+Scikit-Learn API
+BANA 275: ML for Text (Spring 2019)
+29
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB # Naïve Bayes 
+from sklearn.svm import SVC
+
+docs, labels = load_data()
+
+model = MultinomialNB() # SVC,LogisticRegression,RandomForestClassifier
+model.fit(docs, labels)
+
+preds = model.predict(docs)
+accuracy(preds, labels) # training accuracy
+
+test_preds = model.predict(test_docs)
+accuracy(test_preds, test_labels) # test accuracy
+Overfitting and Underfitting
+
+Predictive
+Accuracy
+Or F1
+
+Model Complexity
+Accuracy/F1on Train Data
+Accuracy/F1
+on Test Data
+BANA 275: ML for Text (Spring 2019)
+30
+
+
+Means different things for different classifiers
+Most models overfit!
+Text ClusteringVibhanshu “Vibs” Abhishek
+BANA 275: Advanced Data Analytics
+Machine Learning for TEXT
+SPRING 2019
+Outline
+BANA 275: ML for Text (Spring 2019)
+32
+Unsupervised Machine Learning
+K-Means Clustering
+DBSCAN Algorithm
+Hierarchical Clustering
+Outline
+BANA 275: ML for Text (Spring 2019)
+33
+Unsupervised Machine Learning
+K-Means Clustering
+DBSCAN Algorithm
+Hierarchical Clustering
+Unsupervised learning
+Supervised learning
+Predict target value (“y”) given features (“x”)
+
+Unsupervised learning
+Understand patterns of data (just “x”)
+Useful for many reasons
+Data mining (“explain”)
+Missing data values (“impute”)
+Representation (feature generation or selection)
+
+One example: clustering
+Describe data by discrete “groups” with some characteristics
+Text Clustering
+BANA 275: ML for Text (Spring 2019)
+35
+Whole corpus analysis/navigation
+Better user interface
+partition it into groups of related docs
+For improving recall in search applications
+Better search results
+For better navigation of search results
+For speeding up vector space retrieval
+Faster search
+Clustering for Corpus
+BANA 275: ML for Text (Spring 2019)
+36
+Clustering for Search
+BANA 275: ML for Text (Spring 2019)
+37
+Clustering News
+BANA 275: ML for Text (Spring 2019)
+38
+Clustering
+Clustering describes data by “groups”
+The meaning of “groups” may vary by data!
+Examples
+
+Types of Clustering
+BANA 275: ML for Text (Spring 2019)
+40
+Hard vs Soft
+Flat vs Hierarchical
+Hard: One cluster per point
+Soft: Weighted membership to all
+Hard
+Soft
+Flat: Fixed number of clusters
+Hierarchical: Tree of clusters
+What do I need for Clustering?
+BANA 275: ML for Text (Spring 2019)
+41
+Algorithm
+Kmeans, DBSCAN
+Hierarchical Clustering
+… many others, active area of research
+K-Means Clustering
+A simple clustering algorithm
+Iterate between
+Updating the assignment of data to clusters
+Updating the cluster’s summarization
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Notation:
+   Data example i has features xi 
+
+   Assume K clusters
+
+   Each cluster c “described” by a center µc
+
+   Each cluster will “claim” a set of nearby points
+Hard and Flat
+K-Means Clustering
+A simple clustering algorithm
+Iterate between
+Updating the assignment of data to clusters
+Updating the cluster’s summarization
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Notation:
+   Data example i has features xi 
+   Assume K clusters
+   Each cluster c “described” by a center µc
+   Each cluster will “claim” a set of nearby points
+       “Assignment” of ith example: zi = 1..K  
+z2 = 3 
+z1 = 1 
+K-Means Clustering
+Iterate until convergence:
+(A) For each datum, find the closest cluster
+
+(B) Set each cluster to the mean of all assigned data:
+
+
+
+
+
+
+
+(A)
+(B)
+Choosing Number of Clusters
+With cost functionwhat is the optimal value of k?
+Cost always decreases with k!
+A model complexity issue…
+Choosing Number of clusters
+With cost function
+what is the optimal value of k?
+Cost always decreases with k!
+A model complexity issue…
+Pick the point of diminishing returns
+i.e. the “elbow”
+Initialization
+Multiple local optima, depending on initialization
+Try different (randomized) initializations
+Can use cost C to decide which we prefer
+Initialization methods
+Random
+Usually, choose random data index
+Ensures centers are near some data
+Issue: may choose nearby points
+Initialization methods
+Random
+Usually, choose random data index
+Ensures centers are near some data
+Issue: may choose nearby points
+Distance-based
+Start with one random data point
+Find the point farthest from the clusters chosen so far
+Issue: may choose outliers
+Initialization methods
+Random
+Usually, choose random data index
+Ensures centers are near some data
+Issue: may choose nearby points
+Distance-based
+Start with one random data point
+Find the point farthest from the clusters chosen so far
+Issue: may choose outliers
+Random + distance (“k-means++”)
+Choose next points “far but randomly”
+	p(x) ∝ squared distance from x to current centers
+Likely to put a cluster far away, in a region with lots of data
+
+Arthur & Vassilvitskii, 2007
+Out-of-sample points
+Often want to use clustering on new data
+Easy for k-means: choose nearest cluster center
+# perform clustering
+Z , mu , score = kmeans(X, K);
+
+# cluster id = nearest center
+L = knnClassify(mu, range(K), 1);
+
+# assign in- or out-of-sample points
+Z = L.predict(X);
+With Labels: Is Clustering Good?
+BANA 275: ML for Text (Spring 2019)
+52
+What if we also have labeled data?
+Points in cluster k
+Points with label j
+For each cluster, get majority label
+Count points in that cluster thathave that label
+Add them up, divide by total points
+Another Example
+BANA 275: ML for Text (Spring 2019)
+53
+Summary
+K-Means clustering
+Clusters described as locations (“centers”) in feature space
+Procedure
+Initialize cluster centers
+Iterate: assign each data point to its closest cluster center
+            : move cluster centers to minimize mean squared error
+Properties
+Always converges 
+initialization important
+Choosing the # of clusters, K
+The “elbow” method
+Outline
+BANA 275: ML for Text (Spring 2019)
+55
+Unsupervised Machine Learning
+K-Means Clustering
+DBSCAN Algorithm
+Hierarchical Clustering
+Does K-Means always work?
+BANA 275: ML for Text (Spring 2019)
+56
+
+
+DBSCAN
+BANA 275: ML for Text (Spring 2019)
+57
+Radius, eps
+Min samples
+No need for number of clusters
+Three types of points
+Core points: that have >min_samples neighbors in radius eps
+These are “interior” points
+Border points: <min_samples neighbors (in radius eps), but has a core point
+Defines the edges of the clusters
+Noise points: Any other points
+These are outliers to the clusters
+DBSCAN Example: Ideal Eps
+BANA 275: ML for Text (Spring 2019)
+58
+DBSCAN Example: Eps too big
+BANA 275: ML for Text (Spring 2019)
+59
+In-Class Activity 2
+
+BANA 275: ML for Text (Spring 2019)
+60
+Outline
+BANA 275: ML for Text (Spring 2019)
+61
+Unsupervised Machine Learning
+K-Means Clustering
+DBSCAN Algorithm
+Hierarchical Clustering
+Hierarchical Clustering
+Build a tree-based hierarchical taxonomy (dendrogram) from a set of documents.
+Ch. 17
+Hierarchical Agglomerative Clustering
+ A simple clustering algorithm
+ Define a distance between clusters
+ Initialize: every example is a cluster
+ Iterate:
+Compute distances between all clusters 
+Merge two closest clusters
+ Save both clustering and sequence of cluster operations
+ Result: “Dendrogram”
+Initially, every datum is a cluster
+Data:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Data:
+Height of the join
+indicates dissimilarity
+Dendrogram:
+Builds up a sequence of clusters (“hierarchical”)
+Iteration 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Data:
+Height of the join
+indicates dissimilarity
+Dendrogram:
+Iteration 2
+Builds up a sequence of clusters (“hierarchical”)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Data:
+Height of the join
+indicates dissimilarity
+Dendrogram:
+
+
+Iteration 3
+Builds up a sequence of clusters (“hierarchical”)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+Data:
+Dendrogram:
+Iteration m-3
+Builds up a sequence of clusters (“hierarchical”)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+Data:
+Dendrogram:
+Iteration m-2
+Builds up a sequence of clusters (“hierarchical”)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+Data:
+Dendrogram:
+Iteration m-1
+Builds up a sequence of clusters (“hierarchical”)
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+Data:
+Dendrogram:
+Given the sequence, can select a number of clusters or a dissimilarity threshold:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+From dendrogram to clusters
+produces minimal spanning tree.
+
+Cluster distances
+Summary
+Agglomerative clustering
+Choose a cluster distance / dissimilarity scoring method
+Successively merge closest pair of clusters
+“Dendrogram” shows sequence of merges & distances
+Agglomerative clusters depend critically on dissimilarity
+Choice determines characteristics of “found” clusters
+Lots of Approaches!
+BANA 275: ML for Text (Spring 2019)
+73
+http://scikit-learn.org/stable/modules/clustering.html
+Not easy to figure out which one your data looks like!

@@ -1,0 +1,3224 @@
+Title: Naive Bayes classifier
+URL: https://en.wikipedia.org/wiki/Naive_Bayes_classifier
+Source: Wikipedia
+Document Type: Encyclopedia Article
+Domain: Artificial Intelligence & Machine Learning
+============================================================
+
+In statistics, naive (sometimes simple or idiot's) Bayes classifiers are a family of "probabilistic classifiers" which assumes that the features are conditionally independent, given the target class. In other words, a naive Bayes model assumes the information about the class provided by each variable is unrelated to the information from the others, with no information shared between the predictors. The highly unrealistic nature of this assumption, called the naive independence assumption, is what gives the classifier its name. These classifiers are some of the simplest Bayesian network models.
+Naive Bayes classifiers generally perform worse than more advanced models like logistic regressions, especially at quantifying uncertainty (with naive Bayes models often producing wildly overconfident probabilities). However, they are highly scalable, requiring only one parameter for each feature or predictor in a learning problem. Maximum-likelihood training can be done by evaluating a closed-form expression (simply by counting observations in each group), rather than the expensive iterative approximation algorithms required by most other models.
+Despite the use of Bayes' theorem in the classifier's decision rule, naive Bayes is not (necessarily) a Bayesian method, and naive Bayes models can be fit to data using either Bayesian or frequentist methods.
+
+Introduction
+Naive Bayes is a simple technique for constructing classifiers: models that assign class labels to problem instances, represented as vectors of feature values, where the class labels are drawn from some finite set. There is not a single algorithm for training such classifiers, but a family of algorithms based on a common principle: all naive Bayes classifiers assume that the value of a particular feature is independent of the value of any other feature, given the class variable. For example, a fruit may be considered to be an apple if it is red, round, and about 10 cm in diameter.  A naive Bayes classifier considers each of these features to contribute independently to the probability that this fruit is an apple, regardless of any possible correlations between the color, roundness, and diameter features.
+In many practical applications, parameter estimation for naive Bayes models uses the method of maximum likelihood; in other words, one can work with the naive Bayes model without accepting Bayesian probability or using any Bayesian methods.
+Despite their naive design and apparently oversimplified assumptions, naive Bayes classifiers have worked quite well in many complex real-world situations. In 2004, an analysis of the Bayesian classification problem showed that there are sound theoretical reasons for the apparently implausible efficacy of naive Bayes classifiers. Still, a comprehensive comparison with other classification algorithms in 2006 showed that Bayes classification is outperformed by other approaches, such as boosted trees or random forests.
+An advantage of naive Bayes is that it only requires a small amount of training data to estimate the parameters necessary for classification.
+
+Probabilistic model
+Abstractly, naive Bayes is a conditional probability model: it assigns probabilities 
+  
+    
+      
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        ∣
+        
+          x
+          
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          x
+          
+            n
+          
+        
+        )
+      
+    
+    {\displaystyle p(C_{k}\mid x_{1},\ldots ,x_{n})}
+  
+ for each of the K possible outcomes or classes 
+  
+    
+      
+        
+          C
+          
+            k
+          
+        
+      
+    
+    {\displaystyle C_{k}}
+  
+ given a problem instance to be classified, represented by a vector 
+  
+    
+      
+        
+          x
+        
+        =
+        (
+        
+          x
+          
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          x
+          
+            n
+          
+        
+        )
+      
+    
+    {\displaystyle \mathbf {x} =(x_{1},\ldots ,x_{n})}
+  
+ encoding some n features (independent variables).
+The problem with the above formulation is that if the number of features n is large or if a feature can take on a large number of values, then basing such a model on probability tables is infeasible. The model must therefore be reformulated to make it more tractable. Using Bayes' theorem, the conditional probability can be decomposed as:
+
+  
+    
+      
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        ∣
+        
+          x
+        
+        )
+        =
+        
+          
+            
+              p
+              (
+              
+                C
+                
+                  k
+                
+              
+              )
+               
+              p
+              (
+              
+                x
+              
+              ∣
+              
+                C
+                
+                  k
+                
+              
+              )
+            
+            
+              p
+              (
+              
+                x
+              
+              )
+            
+          
+        
+        
+      
+    
+    {\displaystyle p(C_{k}\mid \mathbf {x} )={\frac {p(C_{k})\ p(\mathbf {x} \mid C_{k})}{p(\mathbf {x} )}}\,}
+  
+
+In plain English, using Bayesian probability terminology, the above equation can be written as
+
+  
+    
+      
+        
+          posterior
+        
+        =
+        
+          
+            
+              
+                prior
+              
+              ×
+              
+                likelihood
+              
+            
+            evidence
+          
+        
+        
+      
+    
+    {\displaystyle {\text{posterior}}={\frac {{\text{prior}}\times {\text{likelihood}}}{\text{evidence}}}\,}
+  
+
+In practice, there is interest only in the numerator of that fraction, because the denominator does not depend on 
+  
+    
+      
+        C
+      
+    
+    {\displaystyle C}
+  
+ and the values of the features 
+  
+    
+      
+        
+          x
+          
+            i
+          
+        
+      
+    
+    {\displaystyle x_{i}}
+  
+ are given, so that the denominator is effectively constant.
+The numerator is equivalent to the joint probability model
+
+  
+    
+      
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        ,
+        
+          x
+          
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          x
+          
+            n
+          
+        
+        )
+        
+      
+    
+    {\displaystyle p(C_{k},x_{1},\ldots ,x_{n})\,}
+  
+
+which can be rewritten as follows, using the chain rule for repeated applications of the definition of conditional probability:
+
+  
+    
+      
+        
+          
+            
+              
+                p
+                (
+                
+                  C
+                  
+                    k
+                  
+                
+                ,
+                
+                  x
+                  
+                    1
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                )
+              
+              
+                
+                =
+                p
+                (
+                
+                  x
+                  
+                    1
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                ,
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+              
+            
+            
+              
+              
+                
+                =
+                p
+                (
+                
+                  x
+                  
+                    1
+                  
+                
+                ∣
+                
+                  x
+                  
+                    2
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                ,
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                p
+                (
+                
+                  x
+                  
+                    2
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                ,
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+              
+            
+            
+              
+              
+                
+                =
+                p
+                (
+                
+                  x
+                  
+                    1
+                  
+                
+                ∣
+                
+                  x
+                  
+                    2
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                ,
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                p
+                (
+                
+                  x
+                  
+                    2
+                  
+                
+                ∣
+                
+                  x
+                  
+                    3
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                ,
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                p
+                (
+                
+                  x
+                  
+                    3
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                ,
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+              
+            
+            
+              
+              
+                
+                =
+                ⋯
+              
+            
+            
+              
+              
+                
+                =
+                p
+                (
+                
+                  x
+                  
+                    1
+                  
+                
+                ∣
+                
+                  x
+                  
+                    2
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                ,
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                p
+                (
+                
+                  x
+                  
+                    2
+                  
+                
+                ∣
+                
+                  x
+                  
+                    3
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                ,
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                ⋯
+                p
+                (
+                
+                  x
+                  
+                    n
+                    −
+                    1
+                  
+                
+                ∣
+                
+                  x
+                  
+                    n
+                  
+                
+                ,
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                p
+                (
+                
+                  x
+                  
+                    n
+                  
+                
+                ∣
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                p
+                (
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+              
+            
+          
+        
+      
+    
+    {\displaystyle {\begin{aligned}p(C_{k},x_{1},\ldots ,x_{n})&=p(x_{1},\ldots ,x_{n},C_{k})\\&=p(x_{1}\mid x_{2},\ldots ,x_{n},C_{k})\ p(x_{2},\ldots ,x_{n},C_{k})\\&=p(x_{1}\mid x_{2},\ldots ,x_{n},C_{k})\ p(x_{2}\mid x_{3},\ldots ,x_{n},C_{k})\ p(x_{3},\ldots ,x_{n},C_{k})\\&=\cdots \\&=p(x_{1}\mid x_{2},\ldots ,x_{n},C_{k})\ p(x_{2}\mid x_{3},\ldots ,x_{n},C_{k})\cdots p(x_{n-1}\mid x_{n},C_{k})\ p(x_{n}\mid C_{k})\ p(C_{k})\\\end{aligned}}}
+  
+
+Now the "naive" conditional independence assumptions come into play: assume that all features in 
+  
+    
+      
+        
+          x
+        
+      
+    
+    {\displaystyle \mathbf {x} }
+  
+ are mutually independent, conditional on the category 
+  
+    
+      
+        
+          C
+          
+            k
+          
+        
+      
+    
+    {\displaystyle C_{k}}
+  
+. Under this assumption,
+
+  
+    
+      
+        p
+        (
+        
+          x
+          
+            i
+          
+        
+        ∣
+        
+          x
+          
+            i
+            +
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          x
+          
+            n
+          
+        
+        ,
+        
+          C
+          
+            k
+          
+        
+        )
+        =
+        p
+        (
+        
+          x
+          
+            i
+          
+        
+        ∣
+        
+          C
+          
+            k
+          
+        
+        )
+        
+        .
+      
+    
+    {\displaystyle p(x_{i}\mid x_{i+1},\ldots ,x_{n},C_{k})=p(x_{i}\mid C_{k})\,.}
+  
+
+Thus, the joint model can be expressed as
+
+  
+    
+      
+        
+          
+            
+              
+                p
+                (
+                
+                  C
+                  
+                    k
+                  
+                
+                ∣
+                
+                  x
+                  
+                    1
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                )
+                ∝
+                 
+              
+              
+                p
+                (
+                
+                  C
+                  
+                    k
+                  
+                
+                ,
+                
+                  x
+                  
+                    1
+                  
+                
+                ,
+                …
+                ,
+                
+                  x
+                  
+                    n
+                  
+                
+                )
+              
+            
+            
+              
+              
+                
+                =
+                p
+                (
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                p
+                (
+                
+                  x
+                  
+                    1
+                  
+                
+                ∣
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                p
+                (
+                
+                  x
+                  
+                    2
+                  
+                
+                ∣
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                p
+                (
+                
+                  x
+                  
+                    3
+                  
+                
+                ∣
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                 
+                ⋯
+              
+            
+            
+              
+              
+                
+                =
+                p
+                (
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                
+                  ∏
+                  
+                    i
+                    =
+                    1
+                  
+                  
+                    n
+                  
+                
+                p
+                (
+                
+                  x
+                  
+                    i
+                  
+                
+                ∣
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                
+                ,
+              
+            
+          
+        
+      
+    
+    {\displaystyle {\begin{aligned}p(C_{k}\mid x_{1},\ldots ,x_{n})\varpropto \ &p(C_{k},x_{1},\ldots ,x_{n})\\&=p(C_{k})\ p(x_{1}\mid C_{k})\ p(x_{2}\mid C_{k})\ p(x_{3}\mid C_{k})\ \cdots \\&=p(C_{k})\prod _{i=1}^{n}p(x_{i}\mid C_{k})\,,\end{aligned}}}
+  
+
+where 
+  
+    
+      
+        ∝
+      
+    
+    {\displaystyle \varpropto }
+  
+ denotes proportionality since the denominator 
+  
+    
+      
+        p
+        (
+        
+          x
+        
+        )
+      
+    
+    {\displaystyle p(\mathbf {x} )}
+  
+ is omitted.
+This means that under the above independence assumptions, the conditional distribution over the class variable 
+  
+    
+      
+        C
+      
+    
+    {\displaystyle C}
+  
+ is:
+
+  
+    
+      
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        ∣
+        
+          x
+          
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          x
+          
+            n
+          
+        
+        )
+        =
+        
+          
+            1
+            Z
+          
+        
+         
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        )
+        
+          ∏
+          
+            i
+            =
+            1
+          
+          
+            n
+          
+        
+        p
+        (
+        
+          x
+          
+            i
+          
+        
+        ∣
+        
+          C
+          
+            k
+          
+        
+        )
+      
+    
+    {\displaystyle p(C_{k}\mid x_{1},\ldots ,x_{n})={\frac {1}{Z}}\ p(C_{k})\prod _{i=1}^{n}p(x_{i}\mid C_{k})}
+  
+
+where the evidence 
+  
+    
+      
+        Z
+        =
+        p
+        (
+        
+          x
+        
+        )
+        =
+        
+          ∑
+          
+            k
+          
+        
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        )
+         
+        p
+        (
+        
+          x
+        
+        ∣
+        
+          C
+          
+            k
+          
+        
+        )
+      
+    
+    {\displaystyle Z=p(\mathbf {x} )=\sum _{k}p(C_{k})\ p(\mathbf {x} \mid C_{k})}
+  
+ is a scaling factor dependent only on 
+  
+    
+      
+        
+          x
+          
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          x
+          
+            n
+          
+        
+      
+    
+    {\displaystyle x_{1},\ldots ,x_{n}}
+  
+, that is, a constant if the values of the feature variables are known.
+Often, it is only necessary to discriminate between classes. In that case, the scaling factor is irrelevant, and it is sufficient to calculate the log-probability up to a factor:
+  
+    
+      
+        ln
+        ⁡
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        ∣
+        
+          x
+          
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          x
+          
+            n
+          
+        
+        )
+        =
+        ln
+        ⁡
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        )
+        +
+        
+          ∑
+          
+            i
+            =
+            1
+          
+          
+            n
+          
+        
+        ln
+        ⁡
+        p
+        (
+        
+          x
+          
+            i
+          
+        
+        ∣
+        
+          C
+          
+            k
+          
+        
+        )
+        
+          
+            
+              
+                −
+                ln
+                ⁡
+                Z
+              
+              ⏟
+            
+          
+          
+            irrelevant
+          
+        
+      
+    
+    {\displaystyle \ln p(C_{k}\mid x_{1},\ldots ,x_{n})=\ln p(C_{k})+\sum _{i=1}^{n}\ln p(x_{i}\mid C_{k})\underbrace {-\ln Z} _{\text{irrelevant}}}
+  
+The scaling factor is irrelevant, since discrimination subtracts it away:
+  
+    
+      
+        ln
+        ⁡
+        
+          
+            
+              p
+              (
+              
+                C
+                
+                  k
+                
+              
+              ∣
+              
+                x
+                
+                  1
+                
+              
+              ,
+              …
+              ,
+              
+                x
+                
+                  n
+                
+              
+              )
+            
+            
+              p
+              (
+              
+                C
+                
+                  l
+                
+              
+              ∣
+              
+                x
+                
+                  1
+                
+              
+              ,
+              …
+              ,
+              
+                x
+                
+                  n
+                
+              
+              )
+            
+          
+        
+        =
+        
+          (
+          
+            ln
+            ⁡
+            p
+            (
+            
+              C
+              
+                k
+              
+            
+            )
+            +
+            
+              ∑
+              
+                i
+                =
+                1
+              
+              
+                n
+              
+            
+            ln
+            ⁡
+            p
+            (
+            
+              x
+              
+                i
+              
+            
+            ∣
+            
+              C
+              
+                k
+              
+            
+            )
+          
+          )
+        
+        −
+        
+          (
+          
+            ln
+            ⁡
+            p
+            (
+            
+              C
+              
+                l
+              
+            
+            )
+            +
+            
+              ∑
+              
+                i
+                =
+                1
+              
+              
+                n
+              
+            
+            ln
+            ⁡
+            p
+            (
+            
+              x
+              
+                i
+              
+            
+            ∣
+            
+              C
+              
+                l
+              
+            
+            )
+          
+          )
+        
+      
+    
+    {\displaystyle \ln {\frac {p(C_{k}\mid x_{1},\ldots ,x_{n})}{p(C_{l}\mid x_{1},\ldots ,x_{n})}}=\left(\ln p(C_{k})+\sum _{i=1}^{n}\ln p(x_{i}\mid C_{k})\right)-\left(\ln p(C_{l})+\sum _{i=1}^{n}\ln p(x_{i}\mid C_{l})\right)}
+  
+There are two benefits of using log-probability. One is that it allows an interpretation in information theory, where log-probabilities are units of information in nats. Another is that it avoids arithmetic underflow.
+
+Constructing a classifier from the probability model
+The discussion so far has derived the independent feature model, that is, the naive Bayes probability model. The naive Bayes classifier combines this model with a decision rule. One common rule is to pick the hypothesis that is most probable so as to minimize the probability of misclassification; this is known as the maximum a posteriori or MAP decision rule. The corresponding classifier, a Bayes classifier, is the function that assigns a class label 
+  
+    
+      
+        
+          
+            
+              y
+              ^
+            
+          
+        
+        =
+        
+          C
+          
+            k
+          
+        
+      
+    
+    {\displaystyle {\hat {y}}=C_{k}}
+  
+ for some k as follows:
+
+  
+    
+      
+        
+          
+            
+              y
+              ^
+            
+          
+        
+        =
+        
+          
+            argmax
+            
+              k
+              ∈
+              {
+              1
+              ,
+              …
+              ,
+              K
+              }
+            
+          
+        
+         
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        )
+        
+          
+            ∏
+            
+              i
+              =
+              1
+            
+            
+              n
+            
+          
+          p
+          (
+          
+            x
+            
+              i
+            
+          
+          ∣
+          
+            C
+            
+              k
+            
+          
+          )
+          .
+        
+      
+    
+    {\displaystyle {\hat {y}}={\underset {k\in \{1,\ldots ,K\}}{\operatorname {argmax} }}\ p(C_{k})\displaystyle \prod _{i=1}^{n}p(x_{i}\mid C_{k}).}
+
+Parameter estimation and event models
+A class's prior may be calculated by assuming equiprobable classes, i.e., 
+  
+    
+      
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        )
+        =
+        
+          
+            1
+            K
+          
+        
+      
+    
+    {\displaystyle p(C_{k})={\frac {1}{K}}}
+  
+, or by calculating an estimate for the class probability from the training set:
+
+  
+    
+      
+        
+          prior for a given class
+        
+        =
+        
+          
+            no. of samples in that class
+            total no. of samples
+          
+        
+        
+      
+    
+    {\displaystyle {\text{prior for a given class}}={\frac {\text{no. of samples in that class}}{\text{total no. of samples}}}\,}
+  
+
+To estimate the parameters for a feature's distribution, one must assume a distribution or generate nonparametric models for the features from the training set.
+The assumptions on distributions of features are called the "event model" of the naive Bayes classifier. For discrete features like the ones encountered in document classification (include spam filtering), multinomial and Bernoulli distributions are popular. These assumptions lead to two distinct models, which are often confused.
+
+Gaussian naive Bayes
+When dealing with continuous data, a typical assumption is that the continuous values associated with each class are distributed according to a normal (or Gaussian) distribution. For example, suppose the training data contains a continuous attribute, 
+  
+    
+      
+        x
+      
+    
+    {\displaystyle x}
+  
+. The data is first segmented by the class, and then the mean and variance of 
+  
+    
+      
+        x
+      
+    
+    {\displaystyle x}
+  
+ is computed in each class. Let 
+  
+    
+      
+        
+          μ
+          
+            k
+          
+        
+      
+    
+    {\displaystyle \mu _{k}}
+  
+ be the mean of the values in 
+  
+    
+      
+        x
+      
+    
+    {\displaystyle x}
+  
+ associated with class 
+  
+    
+      
+        
+          C
+          
+            k
+          
+        
+      
+    
+    {\displaystyle C_{k}}
+  
+, and let 
+  
+    
+      
+        
+          σ
+          
+            k
+          
+          
+            2
+          
+        
+      
+    
+    {\displaystyle \sigma _{k}^{2}}
+  
+ be the Bessel corrected variance of the values in 
+  
+    
+      
+        x
+      
+    
+    {\displaystyle x}
+  
+ associated with class 
+  
+    
+      
+        
+          C
+          
+            k
+          
+        
+      
+    
+    {\displaystyle C_{k}}
+  
+. Suppose one has collected some observation value 
+  
+    
+      
+        v
+      
+    
+    {\displaystyle v}
+  
+. Then, the probability density of 
+  
+    
+      
+        v
+      
+    
+    {\displaystyle v}
+  
+ given a class 
+  
+    
+      
+        
+          C
+          
+            k
+          
+        
+      
+    
+    {\displaystyle C_{k}}
+  
+, i.e., 
+  
+    
+      
+        p
+        (
+        x
+        =
+        v
+        ∣
+        
+          C
+          
+            k
+          
+        
+        )
+      
+    
+    {\displaystyle p(x=v\mid C_{k})}
+  
+, can be computed by plugging 
+  
+    
+      
+        v
+      
+    
+    {\displaystyle v}
+  
+ into the equation for a normal distribution parameterized by 
+  
+    
+      
+        
+          μ
+          
+            k
+          
+        
+      
+    
+    {\displaystyle \mu _{k}}
+  
+ and 
+  
+    
+      
+        
+          σ
+          
+            k
+          
+          
+            2
+          
+        
+      
+    
+    {\displaystyle \sigma _{k}^{2}}
+  
+. Formally,
+
+  
+    
+      
+        p
+        (
+        x
+        =
+        v
+        ∣
+        
+          C
+          
+            k
+          
+        
+        )
+        =
+        
+          
+            1
+            
+              2
+              π
+              
+                σ
+                
+                  k
+                
+                
+                  2
+                
+              
+            
+          
+        
+        
+        
+          e
+          
+            −
+            
+              
+                
+                  (
+                  v
+                  −
+                  
+                    μ
+                    
+                      k
+                    
+                  
+                  
+                    )
+                    
+                      2
+                    
+                  
+                
+                
+                  2
+                  
+                    σ
+                    
+                      k
+                    
+                    
+                      2
+                    
+                  
+                
+              
+            
+          
+        
+      
+    
+    {\displaystyle p(x=v\mid C_{k})={\frac {1}{\sqrt {2\pi \sigma _{k}^{2}}}}\,e^{-{\frac {(v-\mu _{k})^{2}}{2\sigma _{k}^{2}}}}}
+  
+
+Another common technique for handling continuous values is to use binning to discretize the feature values and obtain a new set of Bernoulli-distributed features. Some literature suggests that this is required in order to use naive Bayes, but it is not true, as the discretization may throw away discriminative information.
+Sometimes the distribution of class-conditional marginal densities is far from normal. In these cases, kernel density estimation can be used for a more realistic estimate of the marginal densities of each class. This method, which was introduced by John and Langley, can boost the accuracy of the classifier considerably.
+
+Multinomial naive Bayes
+With a multinomial event model, samples (feature vectors) represent the frequencies with which certain events have been generated by a multinomial 
+  
+    
+      
+        (
+        
+          p
+          
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          p
+          
+            n
+          
+        
+        )
+      
+    
+    {\displaystyle (p_{1},\dots ,p_{n})}
+  
+ where 
+  
+    
+      
+        
+          p
+          
+            i
+          
+        
+      
+    
+    {\displaystyle p_{i}}
+  
+ is the probability that event i occurs (or K such multinomials in the multiclass case). A feature vector 
+  
+    
+      
+        
+          x
+        
+        =
+        (
+        
+          x
+          
+            1
+          
+        
+        ,
+        …
+        ,
+        
+          x
+          
+            n
+          
+        
+        )
+      
+    
+    {\displaystyle \mathbf {x} =(x_{1},\dots ,x_{n})}
+  
+ is then a histogram, with 
+  
+    
+      
+        
+          x
+          
+            i
+          
+        
+      
+    
+    {\displaystyle x_{i}}
+  
+ counting the number of times event i was observed in a particular instance. This is the event model typically used for document classification, with events representing the occurrence of a word in a single document (see bag of words assumption). The likelihood of observing a histogram x is given by:
+
+  
+    
+      
+        p
+        (
+        
+          x
+        
+        ∣
+        
+          C
+          
+            k
+          
+        
+        )
+        =
+        
+          
+            
+              (
+              
+                ∑
+                
+                  i
+                  =
+                  1
+                
+                
+                  n
+                
+              
+              
+                x
+                
+                  i
+                
+              
+              )
+              !
+            
+            
+              
+                ∏
+                
+                  i
+                  =
+                  1
+                
+                
+                  n
+                
+              
+              
+                x
+                
+                  i
+                
+              
+              !
+            
+          
+        
+        
+          ∏
+          
+            i
+            =
+            1
+          
+          
+            n
+          
+        
+        
+          
+            
+              p
+              
+                k
+                i
+              
+            
+          
+          
+            
+              x
+              
+                i
+              
+            
+          
+        
+      
+    
+    {\displaystyle p(\mathbf {x} \mid C_{k})={\frac {(\sum _{i=1}^{n}x_{i})!}{\prod _{i=1}^{n}x_{i}!}}\prod _{i=1}^{n}{p_{ki}}^{x_{i}}}
+  
+
+where 
+  
+    
+      
+        
+          p
+          
+            k
+            i
+          
+        
+        :=
+        p
+        (
+        i
+        ∣
+        
+          C
+          
+            k
+          
+        
+        )
+      
+    
+    {\displaystyle p_{ki}:=p(i\mid C_{k})}
+  
+. 
+The multinomial naive Bayes classifier becomes a linear classifier when expressed in log-space:
+
+  
+    
+      
+        
+          
+            
+              
+                log
+                ⁡
+                p
+                (
+                
+                  C
+                  
+                    k
+                  
+                
+                ∣
+                
+                  x
+                
+                )
+              
+              
+                
+                ∝
+                log
+                ⁡
+                
+                  (
+                  
+                    p
+                    (
+                    
+                      C
+                      
+                        k
+                      
+                    
+                    )
+                    
+                      ∏
+                      
+                        i
+                        =
+                        1
+                      
+                      
+                        n
+                      
+                    
+                    
+                      
+                        
+                          p
+                          
+                            k
+                            i
+                          
+                        
+                      
+                      
+                        
+                          x
+                          
+                            i
+                          
+                        
+                      
+                    
+                  
+                  )
+                
+              
+            
+            
+              
+              
+                
+                =
+                log
+                ⁡
+                p
+                (
+                
+                  C
+                  
+                    k
+                  
+                
+                )
+                +
+                
+                  ∑
+                  
+                    i
+                    =
+                    1
+                  
+                  
+                    n
+                  
+                
+                
+                  x
+                  
+                    i
+                  
+                
+                ⋅
+                log
+                ⁡
+                
+                  p
+                  
+                    k
+                    i
+                  
+                
+              
+            
+            
+              
+              
+                
+                =
+                b
+                +
+                
+                  
+                    w
+                  
+                  
+                    k
+                  
+                  
+                    ⊤
+                  
+                
+                
+                  x
+                
+              
+            
+          
+        
+      
+    
+    {\displaystyle {\begin{aligned}\log p(C_{k}\mid \mathbf {x} )&\varpropto \log \left(p(C_{k})\prod _{i=1}^{n}{p_{ki}}^{x_{i}}\right)\\&=\log p(C_{k})+\sum _{i=1}^{n}x_{i}\cdot \log p_{ki}\\&=b+\mathbf {w} _{k}^{\top }\mathbf {x} \end{aligned}}}
+  
+
+where 
+  
+    
+      
+        b
+        =
+        log
+        ⁡
+        p
+        (
+        
+          C
+          
+            k
+          
+        
+        )
+      
+    
+    {\displaystyle b=\log p(C_{k})}
+  
+ and 
+  
+    
+      
+        
+          w
+          
+            k
+            i
+          
+        
+        =
+        log
+        ⁡
+        
+          p
+          
+            k
+            i
+          
+        
+      
+    
+    {\displaystyle w_{ki}=\log p_{ki}}
+  
+. Estimating the parameters in log space is advantageous since multiplying a large number of small values can lead to significant rounding error. Applying a log transform reduces the effect of this rounding error.
+If a given class and feature value never occur together in the training data, then the frequency-based probability estimate will be zero, because the probability estimate is directly proportional to the number of occurrences of a feature's value. This is problematic because it will wipe out all information in the other probabilities when they are multiplied. Therefore, it is often desirable to incorporate a small-sample correction, called pseudocount, in all probability estimates such that no probability is ever set to be exactly zero. This way of regularizing naive Bayes is called Laplace smoothing when the pseudocount is one, and Lidstone smoothing in the general case.
+Rennie et al. discuss problems with the multinomial assumption in the context of document classification and possible ways to alleviate those problems, including the use of tf–idf weights instead of raw term frequencies and document length normalization, to produce a naive Bayes classifier that is competitive with support vector machines.
+
+Bernoulli naive Bayes
+In the multivariate Bernoulli event model, features are independent Boolean variables (binary variables) describing inputs. Like the multinomial model, this model is popular for document classification tasks, where binary term occurrence features are used rather than term frequencies. If 
+  
+    
+      
+        
+          x
+          
+            i
+          
+        
+      
+    
+    {\displaystyle x_{i}}
+  
+ is a Boolean expressing the occurrence or absence of the i'th term from the vocabulary, then the likelihood of a document given a class 
+  
+    
+      
+        
+          C
+          
+            k
+          
+        
+      
+    
+    {\displaystyle C_{k}}
+  
+ is given by:
+
+  
+    
+      
+        p
+        (
+        
+          x
+        
+        ∣
+        
+          C
+          
+            k
+          
+        
+        )
+        =
+        
+          ∏
+          
+            i
+            =
+            1
+          
+          
+            n
+          
+        
+        
+          p
+          
+            k
+            i
+          
+          
+            
+              x
+              
+                i
+              
+            
+          
+        
+        (
+        1
+        −
+        
+          p
+          
+            k
+            i
+          
+        
+        
+          )
+          
+            (
+            1
+            −
+            
+              x
+              
+                i
+              
+            
+            )
+          
+        
+      
+    
+    {\displaystyle p(\mathbf {x} \mid C_{k})=\prod _{i=1}^{n}p_{ki}^{x_{i}}(1-p_{ki})^{(1-x_{i})}}
+  
+
+where 
+  
+    
+      
+        
+          p
+          
+            k
+            i
+          
+        
+      
+    
+    {\displaystyle p_{ki}}
+  
+ is the probability of class 
+  
+    
+      
+        
+          C
+          
+            k
+          
+        
+      
+    
+    {\displaystyle C_{k}}
+  
+ generating the term 
+  
+    
+      
+        
+          x
+          
+            i
+          
+        
+      
+    
+    {\displaystyle x_{i}}
+  
+. This event model is especially popular for classifying short texts. It has the benefit of explicitly modelling the absence of terms. Note that a naive Bayes classifier with a Bernoulli event model is not the same as a multinomial NB classifier with frequency counts truncated to one.
+
+Semi-supervised parameter estimation
+Given a way to train a naive Bayes classifier from labeled data, it's possible to construct a semi-supervised training algorithm that can learn from a combination of labeled and unlabeled data by running the supervised learning algorithm in a loop:
+
+Given a collection 
+  
+    
+      
+        D
+        =
+        L
+        ⊎
+        U
+      
+    
+    {\displaystyle D=L\uplus U}
+  
+ of labeled samples L and unlabeled samples U, start by training a naive Bayes classifier on L.
+Until convergence, do:
+Predict class probabilities 
+  
+    
+      
+        P
+        (
+        C
+        ∣
+        x
+        )
+      
+    
+    {\displaystyle P(C\mid x)}
+  
+ for all examples x in 
+  
+    
+      
+        D
+      
+    
+    {\displaystyle D}
+  
+.
+Re-train the model based on the probabilities (not the labels) predicted in the previous step.
+Convergence is determined based on improvement to the model likelihood 
+  
+    
+      
+        P
+        (
+        D
+        ∣
+        θ
+        )
+      
+    
+    {\displaystyle P(D\mid \theta )}
+  
+, where 
+  
+    
+      
+        θ
+      
+    
+    {\displaystyle \theta }
+  
+ denotes the parameters of the naive Bayes model.
+This training algorithm is an instance of the more general expectation–maximization algorithm (EM): the prediction step inside the loop is the E-step of EM, while the re-training of naive Bayes is the M-step. The algorithm is formally justified by the assumption that the data are generated by a mixture model, and the components of this mixture model are exactly the classes of the classification problem.
+
+Discussion
+Despite the fact that the far-reaching independence assumptions are often inaccurate, the naive Bayes classifier has several properties that make it surprisingly useful in practice. In particular, the decoupling of the class conditional feature distributions means that each distribution can be independently estimated as a one-dimensional distribution. This helps alleviate problems stemming from the curse of dimensionality, such as the need for data sets that scale exponentially with the number of features. While naive Bayes often fails to produce a good estimate for the correct class probabilities, this may not be a requirement for many applications. For example, the naive Bayes classifier will make the correct MAP decision rule classification so long as the correct class is predicted as more probable than any other class. This is true regardless of whether the probability estimate is slightly, or even grossly inaccurate. In this manner, the overall classifier can be robust enough to ignore serious deficiencies in its underlying naive probability model. Other reasons for the observed success of the naive Bayes classifier are discussed in the literature cited below.
+
+Relation to logistic regression
+In the case of discrete inputs (indicator or frequency features for discrete events), naive Bayes classifiers form a generative-discriminative pair with multinomial logistic regression classifiers: each naive Bayes classifier can be considered a way of fitting a probability model that optimizes the joint likelihood 
+  
+    
+      
+        p
+        (
+        C
+        ,
+        
+          x
+        
+        )
+      
+    
+    {\displaystyle p(C,\mathbf {x} )}
+  
+, while logistic regression fits the same probability model to optimize the conditional 
+  
+    
+      
+        p
+        (
+        C
+        ∣
+        
+          x
+        
+        )
+      
+    
+    {\displaystyle p(C\mid \mathbf {x} )}
+  
+.
+More formally, we have the following:
+
+The link between the two can be seen by observing that the decision function for naive Bayes (in the binary case) can be rewritten as "predict class 
+  
+    
+      
+        
+          C
+          
+            1
+          
+        
+      
+    
+    {\displaystyle C_{1}}
+  
+ if the odds of 
+  
+    
+      
+        p
+        (
+        
+          C
+          
+            1
+          
+        
+        ∣
+        
+          x
+        
+        )
+      
+    
+    {\displaystyle p(C_{1}\mid \mathbf {x} )}
+  
+ exceed those of 
+  
+    
+      
+        p
+        (
+        
+          C
+          
+            2
+          
+        
+        ∣
+        
+          x
+        
+        )
+      
+    
+    {\displaystyle p(C_{2}\mid \mathbf {x} )}
+  
+". Expressing this in log-space gives:
+
+  
+    
+      
+        log
+        ⁡
+        
+          
+            
+              p
+              (
+              
+                C
+                
+                  1
+                
+              
+              ∣
+              
+                x
+              
+              )
+            
+            
+              p
+              (
+              
+                C
+                
+                  2
+                
+              
+              ∣
+              
+                x
+              
+              )
+            
+          
+        
+        =
+        log
+        ⁡
+        p
+        (
+        
+          C
+          
+            1
+          
+        
+        ∣
+        
+          x
+        
+        )
+        −
+        log
+        ⁡
+        p
+        (
+        
+          C
+          
+            2
+          
+        
+        ∣
+        
+          x
+        
+        )
+        >
+        0
+      
+    
+    {\displaystyle \log {\frac {p(C_{1}\mid \mathbf {x} )}{p(C_{2}\mid \mathbf {x} )}}=\log p(C_{1}\mid \mathbf {x} )-\log p(C_{2}\mid \mathbf {x} )>0}
+  
+
+The left-hand side of this equation is the log-odds, or logit, the quantity predicted by the linear model that underlies logistic regression. Since naive Bayes is also a linear model for the two "discrete" event models, it can be reparametrised as a linear function 
+  
+    
+      
+        b
+        +
+        
+          
+            w
+          
+          
+            ⊤
+          
+        
+        x
+        >
+        0
+      
+    
+    {\displaystyle b+\mathbf {w} ^{\top }x>0}
+  
+. Obtaining the probabilities is then a matter of applying the logistic function to 
+  
+    
+      
+        b
+        +
+        
+          
+            w
+          
+          
+            ⊤
+          
+        
+        x
+      
+    
+    {\displaystyle b+\mathbf {w} ^{\top }x}
+  
+, or in the multiclass case, the softmax function.
+Discriminative classifiers have lower asymptotic error than generative ones; however, research by Ng and Jordan has shown that in some practical cases naive Bayes can outperform logistic regression because it reaches its asymptotic error faster.
+
+Examples
+Person classification
+Problem: classify whether a given person is a male or a female based on the measured features.
+The features include height, weight, and foot size. Although with NB classifier we treat them as independent, they are not in reality.
+
+Training
+Example training set below.
+
+The classifier created from the training set using a Gaussian distribution assumption would be (given variances are unbiased sample variances):
+
+The following example assumes equiprobable classes so that P(male)= P(female) = 0.5. This prior probability distribution might be based on prior knowledge of frequencies in the larger population or in the training set.
+
+Testing
+Below is a sample to be classified as male or female.
+
+In order to classify the sample, one has to determine which posterior is greater, male or female. For the classification as male the posterior is given by
+
+  
+    
+      
+        
+          posterior (male)
+        
+        =
+        
+          
+            
+              P
+              (
+              
+                male
+              
+              )
+              
+              p
+              (
+              
+                height
+              
+              ∣
+              
+                male
+              
+              )
+              
+              p
+              (
+              
+                weight
+              
+              ∣
+              
+                male
+              
+              )
+              
+              p
+              (
+              
+                foot size
+              
+              ∣
+              
+                male
+              
+              )
+            
+            evidence
+          
+        
+      
+    
+    {\displaystyle {\text{posterior (male)}}={\frac {P({\text{male}})\,p({\text{height}}\mid {\text{male}})\,p({\text{weight}}\mid {\text{male}})\,p({\text{foot size}}\mid {\text{male}})}{\text{evidence}}}}
+  
+
+For the classification as female the posterior is given by
+
+  
+    
+      
+        
+          posterior (female)
+        
+        =
+        
+          
+            
+              P
+              (
+              
+                female
+              
+              )
+              
+              p
+              (
+              
+                height
+              
+              ∣
+              
+                female
+              
+              )
+              
+              p
+              (
+              
+                weight
+              
+              ∣
+              
+                female
+              
+              )
+              
+              p
+              (
+              
+                foot size
+              
+              ∣
+              
+                female
+              
+              )
+            
+            evidence
+          
+        
+      
+    
+    {\displaystyle {\text{posterior (female)}}={\frac {P({\text{female}})\,p({\text{height}}\mid {\text{female}})\,p({\text{weight}}\mid {\text{female}})\,p({\text{foot size}}\mid {\text{female}})}{\text{evidence}}}}
+  
+
+The evidence (also termed normalizing constant) may be calculated:
+
+  
+    
+      
+        
+          
+            
+              
+                
+                  evidence
+                
+                =
+                P
+                (
+                
+                  male
+                
+                )
+                
+                p
+                (
+                
+                  height
+                
+                ∣
+                
+                  male
+                
+                )
+                
+                p
+                (
+                
+                  weight
+                
+                ∣
+                
+                  male
+                
+                )
+                
+                p
+                (
+                
+                  foot size
+                
+                ∣
+                
+                  male
+                
+                )
+              
+            
+            
+              
+                +
+                P
+                (
+                
+                  female
+                
+                )
+                
+                p
+                (
+                
+                  height
+                
+                ∣
+                
+                  female
+                
+                )
+                
+                p
+                (
+                
+                  weight
+                
+                ∣
+                
+                  female
+                
+                )
+                
+                p
+                (
+                
+                  foot size
+                
+                ∣
+                
+                  female
+                
+                )
+              
+            
+          
+        
+      
+    
+    {\displaystyle {\begin{aligned}{\text{evidence}}=P({\text{male}})\,p({\text{height}}\mid {\text{male}})\,p({\text{weight}}\mid {\text{male}})\,p({\text{foot size}}\mid {\text{male}})\\+P({\text{female}})\,p({\text{height}}\mid {\text{female}})\,p({\text{weight}}\mid {\text{female}})\,p({\text{foot size}}\mid {\text{female}})\end{aligned}}}
+  
+
+However, given the sample, the evidence is a constant and thus scales both posteriors equally. It therefore does not affect classification and can be ignored.  The probability distribution for the sex of the sample can now be determined:
+
+  
+    
+      
+        P
+        (
+        
+          male
+        
+        )
+        =
+        0.5
+      
+    
+    {\displaystyle P({\text{male}})=0.5}
+  
+
+  
+    
+      
+        p
+        (
+        
+          height
+        
+        ∣
+        
+          male
+        
+        )
+        =
+        
+          
+            1
+            
+              2
+              π
+              
+                σ
+                
+                  2
+                
+              
+            
+          
+        
+        exp
+        ⁡
+        
+          (
+          
+            
+              
+                −
+                (
+                6
+                −
+                μ
+                
+                  )
+                  
+                    2
+                  
+                
+              
+              
+                2
+                
+                  σ
+                  
+                    2
+                  
+                
+              
+            
+          
+          )
+        
+        ≈
+        1.5789
+        ,
+      
+    
+    {\displaystyle p({\text{height}}\mid {\text{male}})={\frac {1}{\sqrt {2\pi \sigma ^{2}}}}\exp \left({\frac {-(6-\mu )^{2}}{2\sigma ^{2}}}\right)\approx 1.5789,}
+  
+
+where 
+  
+    
+      
+        μ
+        =
+        5.855
+      
+    
+    {\displaystyle \mu =5.855}
+  
+ and 
+  
+    
+      
+        
+          σ
+          
+            2
+          
+        
+        =
+        3.5033
+        ⋅
+        
+          10
+          
+            −
+            2
+          
+        
+      
+    
+    {\displaystyle \sigma ^{2}=3.5033\cdot 10^{-2}}
+  
+ are the parameters of normal distribution which have been previously determined from the training set. Note that a value greater than 1 is OK here – it is a probability density rather than a probability, because height is a continuous variable.
+
+  
+    
+      
+        p
+        (
+        
+          weight
+        
+        ∣
+        
+          male
+        
+        )
+        =
+        
+          
+            1
+            
+              2
+              π
+              
+                σ
+                
+                  2
+                
+              
+            
+          
+        
+        exp
+        ⁡
+        
+          (
+          
+            
+              
+                −
+                (
+                130
+                −
+                μ
+                
+                  )
+                  
+                    2
+                  
+                
+              
+              
+                2
+                
+                  σ
+                  
+                    2
+                  
+                
+              
+            
+          
+          )
+        
+        =
+        5.9881
+        ⋅
+        
+          10
+          
+            −
+            6
+          
+        
+      
+    
+    {\displaystyle p({\text{weight}}\mid {\text{male}})={\frac {1}{\sqrt {2\pi \sigma ^{2}}}}\exp \left({\frac {-(130-\mu )^{2}}{2\sigma ^{2}}}\right)=5.9881\cdot 10^{-6}}
+  
+
+  
+    
+      
+        p
+        (
+        
+          foot size
+        
+        ∣
+        
+          male
+        
+        )
+        =
+        
+          
+            1
+            
+              2
+              π
+              
+                σ
+                
+                  2
+                
+              
+            
+          
+        
+        exp
+        ⁡
+        
+          (
+          
+            
+              
+                −
+                (
+                8
+                −
+                μ
+                
+                  )
+                  
+                    2
+                  
+                
+              
+              
+                2
+                
+                  σ
+                  
+                    2
+                  
+                
+              
+            
+          
+          )
+        
+        =
+        1.3112
+        ⋅
+        
+          10
+          
+            −
+            3
+          
+        
+      
+    
+    {\displaystyle p({\text{foot size}}\mid {\text{male}})={\frac {1}{\sqrt {2\pi \sigma ^{2}}}}\exp \left({\frac {-(8-\mu )^{2}}{2\sigma ^{2}}}\right)=1.3112\cdot 10^{-3}}
+  
+
+  
+    
+      
+        
+          posterior numerator (male)
+        
+        =
+        
+          their product
+        
+        =
+        6.1984
+        ⋅
+        
+          10
+          
+            −
+            9
+          
+        
+      
+    
+    {\displaystyle {\text{posterior numerator (male)}}={\text{their product}}=6.1984\cdot 10^{-9}}
+  
+
+  
+    
+      
+        P
+        (
+        
+          female
+        
+        )
+        =
+        0.5
+      
+    
+    {\displaystyle P({\text{female}})=0.5}
+  
+
+  
+    
+      
+        p
+        (
+        
+          height
+        
+        ∣
+        
+          female
+        
+        )
+        =
+        2.23
+        ⋅
+        
+          10
+          
+            −
+            1
+          
+        
+      
+    
+    {\displaystyle p({\text{height}}\mid {\text{female}})=2.23\cdot 10^{-1}}
+  
+
+  
+    
+      
+        p
+        (
+        
+          weight
+        
+        ∣
+        
+          female
+        
+        )
+        =
+        1.6789
+        ⋅
+        
+          10
+          
+            −
+            2
+          
+        
+      
+    
+    {\displaystyle p({\text{weight}}\mid {\text{female}})=1.6789\cdot 10^{-2}}
+  
+
+  
+    
+      
+        p
+        (
+        
+          foot size
+        
+        ∣
+        
+          fema

@@ -1,0 +1,948 @@
+B A N A 	 2 7 5
+
+Natural	Language	Processing
+&	Generative	AI
+
+Module	1:	Foundations	+	Course	Operating	System
+
+Vibhanshu	Abhishek,	PhD
+
+CEO,	Alltius	|	Associate	Professor,	UC	Irvine
+
+1
+
+Today's	Agenda
+
+— Course	overview	and	the	Forward	Deployed	Engineer	paradigm
+
+— NLP	vs.	GenAI	vs.	Production	Systems
+
+— Real-world	NLP	applications
+
+— Why	NLP	is	hard:	Ambiguity,	Sparsity,	Variation
+
+— Business	workflows	and	problem	framing
+
+— The	evaluation	mindset
+
+— Team	formation	and	environment	setup
+
+2
+
+About	Your	Instructor
+
+Academic:	Associate	Professor,	UC	Irvine	|	Previously:	Carnegie	Mellon	University
+
+Industry:	CEO,	Alltius	—	AI	platform	with	$10M+	documented	value,	millions	of
+
+interactions
+
+Education:	PhD	&	MA	Statistics	(Wharton)	|	B.Tech	Computer	Science	(IIT	Kanpur)
+
+Key	Achievements:
+
+— ~3,000	research	citations
+
+— Published	in	Management	Science,	Marketing	Science,	Operations	Research,	MIS
+Quarterly
+
+— Built	production	AI	systems	serving	Fortune	500	companies
+
+3
+
+What	You'll	Build	This	Semester
+
+— 7	deployed	AI	applications	in	10	weeks
+
+— Semantic	search	engines
+
+— RAG-powered	chatbots	with	citations
+
+— AI	recommendation	systems
+
+— Production-ready	systems	with	evaluation	harnesses
+
+— Portfolio	pieces	for	your	career
+
+4
+
+"The	best	way	to	understand	AI
+
+is	to	ship	AI	products"
+
+30%	Theory	—	70%	Building	&	Shipping
+
+5
+
+Weekly	Structure
+
+Before	Class:	Read	articles,	watch	videos	(prep	work)
+
+During	Class	(3	hours):
+
+— Hour	1:	Concepts	and	theory
+
+— Hour	2:	Hands-on	coding	and	demos
+
+— Hour	3:	Team	work	and	problem-solving
+
+After	Class:	Individual	or	team	homework
+
+Fridays:	Office	hours	(help	sessions,	project	guidance)
+
+6
+
+Course	Grading
+
+Component
+
+Individual	Homework	(3)
+
+Team	Homework	(3)
+
+Class	Participation
+
+Surprise	Quizzes	(2)
+
+Final	Project
+
+Bonus	Opportunities
+
+Weight
+
+15%
+
+30%
+
+10%
+
+10%
+
+35%
+
+up	to	5%
+
+7
+
+Fun	Course	Elements
+
+AI	Roast	Battle	(Week	4)
+
+Watch	AI	models	compete	in	creative	insults
+
+Turing	Test	Game	(Week	6)
+
+Can	you	tell	human	from	AI	responses?
+
+AI	Meme	Competition	(Weeks	7-10)
+
+Create	the	best	AI-themed	meme	for	bonus	points
+
+Break	the	Bot	Lightning	Talks	(Week	9)
+
+2-minute	presentations	on	how	you	broke	an	AI	system
+
+8
+
+Course	Expectations
+
+This	course	is	HARD	but	REWARDING
+
+Expected	workload:	9-10	hours/week	total
+
+3	hours	in	class	+	6-7	hours	outside
+
+You	will	get	stuck.	That's	part	of	learning.
+
+AI	tools	(ChatGPT,	Claude,	Copilot)	are	ALLOWED
+
+Must	document	what	tools	you	used	and	how
+
+Collaboration	is	encouraged,	but	code	must	be	your	own
+
+Late	work:	Zero	tolerance	policy	(production	doesn't	wait!)
+
+9
+
+P A R T 	 2
+
+The	Forward	Deployed
+AI	Engineer
+
+10
+
+What	is	a	Forward	Deployed	AI	Engineer?
+
+A	hybrid	role	that	combines:
+
+— Deep	technical	AI/ML	expertise
+
+— Customer-facing	problem	solving
+
+— Rapid	prototyping	and	deployment
+
+— Business	acumen
+
+You	work	AT	the	customer	site
+
+You	SHIP	code	weekly,	not	quarterly
+
+You	BRIDGE	cutting-edge	research	and	real	products
+
+11
+
+FDAI	Engineer	Skills	Mix
+
+70%
+
+TECHNICAL
+
+AI/ML	expertise
+
+Coding	&	deployment
+
+System	architecture
+
+25%
+
+5%
+
+BUSINESS
+
+COMMUNICATION
+
+Problem	framing
+
+ROI	analysis
+
+Customer	needs
+
+Stakeholder	mgmt
+
+Documentation
+
+Presentations
+
+12
+
+How	Is	This	Different?
+
+Role
+
+Focus
+
+ML	Researcher
+
+Novel	algorithms
+
+Output
+
+Papers
+
+Data	Scientist
+
+Analysis	&	insights
+
+Dashboards
+
+Software	Engineer
+
+Infrastructure
+
+Scalable	systems
+
+FDAI	Engineer
+
+Customer	problems
+
+Deployed	products
+
+13
+
+Who's	Hiring	FDAIEs?
+
+— OpenAI	—	Deploying	GPT-4	for	enterprise	customers
+
+— Anthropic	—	Claude	integration	specialists
+
+— Palantir	—	Foundry	Forward	Deployed	Engineers
+
+— Scale	AI	—	AI	deployment	and	data	operations
+
+— Major	tech	companies	—	AI	product	integration	teams
+
+— Fast-growing	AI	startups	—	First	technical	hires
+
+This	is	one	of	the	fastest-growing	roles	in	tech
+
+14
+
+Why	This	Role	Is	Exploding
+
+— AI	democratization:	Powerful	models	now	accessible	via	APIs
+
+— Product	integration:	Every	company	adding	AI	features
+
+— Speed	matters:	Companies	need	to	ship	AI	products	FAST
+
+— Skills	gap:	Need	people	who	can	code	AND	talk	to	customers
+
+— High	impact:	FDAIEs	often	become	founding	team	members
+
+15
+
+P A R T 	 3
+
+NLP	Applications
+&	Evolution
+
+16
+
+What	is	Natural	Language	Processing?
+
+Teaching	computers	to	understand,	interpret,	and	generate	human
+language
+
+Core	NLP	Tasks:
+
+— Machine	Translation
+
+— Sentiment	Analysis
+
+— Question	Answering
+
+— Text	Classification
+
+— Named	Entity	Recognition
+
+— Text	Summarization
+
+17
+
+The	Evolution	of	NLP
+
+1950s-1980s
+Rule-Based
+
+1990s-2000s
+Statistical
+
+2010s
+Neural	Networks
+
+2020s
+LLMs
+
+What	drove	this	evolution:
+
+— Exponential	growth	in	computing	power
+
+— Availability	of	massive	text	datasets
+
+— Breakthrough	algorithms	(transformers,	attention	mechanisms)
+
+— Transfer	learning	enabling	knowledge	reuse
+
+18
+
+The	Standard	NLP	Pipeline
+
+Raw
+Text
+
+Pre-
+processing
+
+Represent-
+ation
+
+Model
+
+Output
+
+Each	stage	presents	unique	challenges	and	opportunities
+We'll	learn	the	details	in	Module	2
+
+19
+
+Application:	Sentiment	Analysis
+
+Understand	how	customers	feel	about	your	product	or	brand
+
+Use	Cases:
+
+— Social	media	monitoring	(Twitter,	Reddit,	Facebook)
+
+— Product	review	analysis	(Amazon,	Yelp)
+
+— Customer	feedback	classification
+
+— Brand	reputation	tracking
+
+— Market	research	and	competitive	analysis
+
+Challenge:	Detecting	sarcasm,	context,	cultural	nuances
+
+20
+
+Application:	Machine	Translation
+
+Translate	text	from	one	language	to	another	automatically
+
+Examples:
+
+— Google	Translate:	100+	languages
+
+— DeepL:	High-quality	translations	for	businesses
+
+— Real-time	meeting	transcription	and	translation
+
+— Document	translation	for	international	business
+
+— Subtitle	generation	for	videos
+
+Breakthrough:	Neural	machine	translation	(2016)	dramatically	improved	quality
+
+21
+
+Application:	Search	&	Question	Answering
+
+Find	information	through	natural	language	queries
+
+Examples:
+
+— Voice	assistants:	"Find	restaurants	near	me"
+
+— Conversational	search:	"Tell	me	more	about	the	first	one"
+
+— Enterprise	search:	Find	documents	across	company	systems
+
+— Customer	support:	Automated	FAQ	responses
+
+— Search	engine	marketing:	Optimize	for	natural	queries
+
+Key:	Understanding	intent,	not	just	matching	keywords
+
+22
+
+Application:	Content	Summarization
+
+Extract	key	information	from	large	volumes	of	text
+
+Use	Cases:
+
+— News	article	summarization
+
+— Meeting	transcript	→	action	items
+
+— Legal	document	analysis
+
+— Customer	review	highlights
+
+— Research	paper	abstracts
+
+Two	Approaches:	Extractive	(select	sentences)	vs.	Abstractive	(generate	new	text)
+
+23
+
+Application:	Named	Entity	Recognition
+
+Identify	and	classify	named	entities	in	text
+
+Extract:
+
+— People:	"Tim	Cook",	"Elon	Musk"
+
+— Organizations:	"Apple",	"Tesla",	"Stanford	University"
+
+— Locations:	"San	Francisco",	"California"
+
+— Dates:	"January	5,	2024"
+
+— Other:	Products,	monetary	values,	percentages
+
+Critical	for:	Information	extraction,	knowledge	graphs,	data	structuring
+
+24
+
+P A R T 	 4
+
+From	Demo	to
+Production
+
+25
+
+Demo	vs.	Production
+
+26
+
+Demo	vs.	Production:	Key	Differences
+
+DEMO
+
+— Works	on	cherry-picked	examples
+
+— No	error	handling
+
+— Slow	response	times	OK
+
+— Cost	not	a	concern
+
+— Single	use	case
+
+— No	monitoring
+
+PRODUCTION
+
+— Handles	edge	cases	gracefully
+
+27
+
+— Robust	error	handling
+
+— Sub-second	latency	required
+Case	Study:	Alltius	in	Production
+— Cost	per	query	matters
+
+— Thousands	of	use	cases
+Enterprise	AI	Platform
+
+— 24/7	monitoring
+
+Scale:	Millions	of	interactions,	multiple	Fortune	500	clients
+
+Challenges	Solved:
+
+In	this	course,	you'll	build	PRODUCTION	systems,	not	demos
+
+— Latency:	Sub-500ms	response	time	with	caching	strategy
+
+— Cost:	$10M+	documented	value	through	optimization
+
+— Reliability:	99.95%	uptime	with	robust	error	handling
+
+— Security:	Enterprise-grade	data	privacy	and	compliance
+
+Key	Insight:	Production	AI	is	10%	model,	90%	engineering
+
+28
+
+P A R T 	 5
+
+Why	Isn't	NLP
+Solved	Yet?
+
+29
+
+Three	Main	Challenges
+
+1.	Ambiguity
+
+2.	Sparsity
+
+3.	Variation
+
+30
+
+Challenge	1:	Ambiguity
+
+"One	tries	to	be	as	informative	as	one	possibly	can,
+and	gives	as	much	information	as	is	needed,	and	no	more."
+
+—	Grice's	Maxim	of	Quantity
+
+The	more	you	know,	the	less	you	need	to	say
+
+Computers	"know"	very	little	→	Language	appears
+highly	ambiguous
+
+31
+
+Word	Ambiguity
+
+"Hershey's	Bars	Protest"
+
+Protest	against
+Hershey's
+chocolate	bars
+
+vs.
+
+Hershey's	candy
+bars	are
+protesting
+
+32
+
+Attachment	Ambiguity
+
+"One	morning	I	shot	an	elephant
+in	my	pajamas."
+
+"How	he	got	into	my	pajamas	I'll	never	know."
+—	Groucho	Marx
+
+Who	was	wearing	the	pajamas?
+
+33
+
+More	Attachment	Examples
+
+"She	saw	the	man	with	the	telescope"
+
+Who	has	the	telescope?
+
+"Stolen	painting	found	by	tree"
+
+Was	the	painting	near	a	tree,	or	did	a	tree	find	it?
+
+"Teacher	Strikes	Idle	Kids"
+
+Are	teachers	striking?	Or	hitting	idle	kids?
+
+"Ban	on	Nude	Dancing	on	Governor's	Desk"
+
+Where	is	the	dancing	happening?
+
+34
+
+Coreference	Ambiguity
+
+Winograd	Schema:	An	Open	Challenge	for	AI
+
+The	councilmen	refused	the	demonstrators	a	permit
+
+because	they	feared	violence.
+
+vs.
+
+The	councilmen	refused	the	demonstrators	a	permit
+
+because	they	advocated	violence.
+
+Who	does	"they"	refer	to?	Context	is	critical!
+
+35
+
+Challenge	2:	Sparsity
+
+A	few	common	words	appear	very	frequently:
+
+the,	of,	to,	and,	a,	in,	is...
+
+Many	words	appear	very	rarely:
+
+cornflakes,	mathematician,	fuzziness,	jumbling...
+
+Over	1/3	of	words	in	any	corpus	occur	only	once
+
+Zipf's	Law:	Regardless	of	data	size,
+
+there	will	always	be	many	rare	words
+
+36
+
+Zipf's	Law	Visualization
+
+No	matter	how	much	data	you	have,	rare	words	are	always	a	challenge
+
+37
+
+Challenge	3:	Variation
+
+Many	ways	to	say	the	same	thing
+
+She	gave	the	book	to	Tom
+
+vs.
+
+She	gave	Tom	the	book
+
+Some	kids	popped	by
+
+vs.
+
+A	few	children	visited
+
+38
+
+Why	These	Challenges	Matter	for	You
+
+Is	that	window	still	open?
+
+Ambiguity:	Your	models	need	context	and	world	knowledge
+
+Please	close	the	window
+
+→	Solution:	Prompt	engineering,	few-shot	learning,	RAG
+
+vs.
+
+Sparsity:	You'll	encounter	words	you've	never	seen	before
+
+→	Solution:	Subword	tokenization,	embeddings,	transfer	learning
+
+Variation:	Users	will	phrase	queries	in	unexpected	ways
+
+→	Solution:	Robust	test	suites	(500+	prompts),	data	augmentation
+
+The	key:	Design	for	robustness,	not	perfection
+
+39
+
+P A R T 	 6
+
+Business	Workflows	&
+Problem	Framing
+
+40
+
+The	Problem	Framing	Framework
+
+41
+
+Case	Study:	Insurance	Email	Routing
+
+CURRENT	STATE:
+
+10,000	emails/day	|	50	agents	manually	categorizing
+
+24-hour	response	time	|	30%	misrouted	|	$50	per	email	cost
+
+AI	OPPORTUNITY:
+
+Automatic	categorization	|	Intelligent	routing
+
+Priority	detection	|	Response	suggestions
+
+EXPECTED	IMPACT:
+
+50%	cost	reduction	|	<1	hour	response	time	|	95%	accuracy
+
+42
+
+Identifying	AI	Opportunities
+
+Look	for	these	patterns:
+
+— High-volume	repetitive	tasks	(emails,	documents,	support	tickets)
+
+— Pattern	recognition	needs	(classification,	routing,	extraction)
+
+— Human	bottlenecks	(waiting	for	review,	approval,	analysis)
+
+— Inconsistent	quality	(different	people,	different	results)
+
+— Time-sensitive	decisions	(real-time	recommendations)
+
+Ask:	"Could	a	smart	intern	do	this	task?"
+If	yes,	AI	probably	can	too
+
+43
+
+When	NOT	to	Use	AI
+
+— Simple	rule-based	logic	works	fine
+
+— No	training	data	available	(and	can't	create	it)
+
+— Problem	requires	100%	accuracy
+
+— High-stakes	decisions	(medical	diagnosis,	legal	judgments)
+
+— Privacy	or	regulatory	constraints	make	it	impossible
+
+— Cost	of	AI	exceeds	value	created
+
+— Explainability	is	critical	but	AI	can't	provide	it
+
+44
+
+Consumer	vs.	Enterprise	AI
+
+Dimension
+
+Consumer
+
+Enterprise
+
+Users
+
+Millions
+
+Hundreds/Thousands
+
+Accuracy
+
+85-90%	OK
+
+95%+	required
+
+Cost
+
+Support
+
+$10-20/month
+
+$1000s-millions/year
+
+Community/docs
+
+24/7	dedicated
+
+Customization
+
+One-size-fits-all
+
+Highly	customized
+
+45
+
+P A R T 	 7
+
+The	Evaluation
+Mindset
+
+46
+
+Why	Evaluation	Matters
+
+"You	can't	improve	what	you	don't	measure"
+
+— Production	requires	quantifiable	performance
+
+— Baselines	establish	"good	enough"
+
+— Testing	prevents	regressions
+
+— Metrics	guide	iteration
+
+— Evaluation	IS	the	product
+
+47
+
+500
+
+Minimum	test	prompts	for	final	projects
+
+This	separates	demos	from	deployable	systems
+
+48
+
+Building	an	Evaluation	Harness
+
+— Test	Set:	Representative,	diverse,	adversarial	examples
+
+— Metrics:	Task-appropriate	(accuracy,	F1,	BLEU,	human	evaluation)
+
+— Baselines:	Simple	solutions	to	beat	(keyword	matching,	rules)
+
+— Edge	Cases:	Where	systems	typically	fail	(sarcasm,	typos,	long
+inputs)
+
+— Consistency:	Same	input	→	same	output?
+
+— Continuous	Testing:	Run	tests	on	every	code	change
+
+49
+
+Example:	Spam	Detection
+
+Baseline	(Keyword-based):
+
+If	email	contains	"viagra"	OR	"prince"	OR	"million	dollars"	→	SPAM
+
+Accuracy:	75%	|	Cost:	$0	|	Speed:	Instant
+
+GPT-4	(Zero-shot):
+
+Prompt:	"Is	this	email	spam?	Answer	yes	or	no:	{email}"
+
+Accuracy:	92%	|	Cost:	$0.003/email	|	Speed:	500ms
+
+Your	Goal:	Beat	the	baseline,	justify	the	cost
+
+50
+
+Team	Formation
+
+Your	startup	co-founders	for	the	next	10	weeks
+
+— Teams	of	exactly	5	students
+
+— Create	team	charter	today	(due	end	of	class):
+
+— Team	name
+
+— Communication	plan	(Slack,	meeting	schedule)
+
+— Rotating	roles
+
+— Conflict	resolution	process
+
+— Peer	evaluations	will	affect	your	grade	(30%	of	team	projects)
+
+— Choose	wisely	—	changes	only	allowed	before	Week	3
+
+51
+
+Getting	Set	Up
+
+Google	Colab	account
+
+GitHub	account
+
+OpenAI	API	key	(or	Anthropic	Claude)
+
+Slack	workspace	access
+
+First	notebook:	Hello	World
+
+Complete	setup	verification	by	end	of	this	week
+
+52
+
+Key	Takeaways
+
+— This	course	is	about	SHIPPING,	not	just	learning
+
+— Forward	Deployed	AI	Engineers	bridge	models	and	products
+
+— NLP	is	hard:	Ambiguity,	Sparsity,	Variation
+
+— Production	AI	requires	evaluation	from	day	one
+
+— Teams	are	critical	—	choose	thoughtfully
+
+— Get	your	environment	ready	this	week!
+
+53
+
+Next	Week:	Module	2
+
+NLP	Basics	+	Vector	Space	Models
+
+— Text	preprocessing	pipeline	(tokenization,	normalization,
+lemmatization)
+
+— Bag	of	Words	and	TF-IDF	representations
+
+— Building	your	first	classifier
+
+— Train/test	methodology
+
+— IHW	1	assigned:	AI	Video	Oscars	Assignment
+
+— Homework:	Read	pre-class	materials,	complete	setup
+
+54
+
+Questions?
+
+vibs@uci.edu
+
+Office	Hours:	Wednesdays	2-3	PM,	or	by	appointment
+
+55
+
+
