@@ -116,10 +116,6 @@ because most student questions about AI/ML are conceptual rather than exact-term
 
 Beyond the core RAG pipeline, we implemented several student-facing features:
 
-- **Fun Fact Banner:** On each new session, the system generates a 2–3 sentence fun fact
-  on a randomly selected topic (RLHF, transformers, LLMs, etc.) from the knowledge base,
-  displayed in a styled banner at the top of the page.
-
 - **Multiple Conversation Logs:** Students can create and switch between named
   conversation threads, each with independent message history and memory context.
 
@@ -165,7 +161,7 @@ The system successfully:
 - Responds to factual and conceptual queries with citations to 3–5 relevant chunks
 - Handles 7-turn follow-up conversations without losing context
 - Provides source citations with chunk-level granularity for academic traceability
-- Generates quizzes, fun facts, and study aids from course-specific materials
+- Generates quizzes and study aids from course-specific materials
 - Runs at near-zero cost using free-tier Gemini API and local embeddings
 
 The hybrid search approach ensured that technical term queries (BM25-strong) and
