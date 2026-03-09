@@ -4,7 +4,7 @@ A production-ready Retrieval-Augmented Generation (RAG) chatbot that acts as
 an NLP professor for BANA275. It answers questions from class lecture slides and
 AI/ML reference materials using hybrid search and Google Gemini.
 
-**Live demo:** `https://sarahjiwonlee-hue-ask-vibs.streamlit.app` ← update after deployment
+**Live demo:** `https://www.youtube.com/watch?v=VSIseF_Hf0g` ← update after deployment
 
 ---
 
